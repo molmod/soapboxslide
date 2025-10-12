@@ -1,5 +1,10 @@
 # A Computational Soap Box Slide
 
+[![release](https://github.com/molmod/soapboxslide/actions/workflows/release.yaml/badge.svg)](https://github.com/molmod/soapboxslide/actions/workflows/release.yaml)
+[![PyPI Version](https://img.shields.io/pypi/v/soapboxslide)](https://pypi.org/project/soapboxslide/)
+![PyPI - Python Version](https://img.shields.io/pypi/pyversions/soapboxslide)
+![GPL-3 License](https://img.shields.io/github/license/molmod/soapboxslide)
+
 This Python package is written by Toon Verstraelen for students of the course
 ["Python for Scientists" (C004212)](http://studiekiezer.ugent.be/studiefiche/en/C004212/2025)
 of the [B.Sc. Physics and Astronomy](https://studiekiezer.ugent.be/2026/bachelor-of-science-in-physics-and-astronomy)
