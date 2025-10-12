@@ -12,6 +12,7 @@ and this project adheres to [Effort-based Versioning](https://jacobtomlinson.dev
 
 - Improved README.
 - Improved clarity of first and last target.
+- Simplify altitude colormap.
 
 ## [1.0.0] - 2025-10-11
 

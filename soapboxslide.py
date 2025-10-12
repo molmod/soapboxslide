@@ -337,13 +337,13 @@ class Slide:
 
         # Plot the path, using a color code for the altitude
         if add_altitude_fill:
-            cm = ax.contourf(
-                xg,
-                yg,
+            cm = ax.imshow(
                 altitude,
-                levels=np.linspace(alt_min, alt_max, nlevel),
+                origin="lower",
+                extent=(0, self.width, 0, self.height),
+                vmin=alt_min,
+                vmax=alt_max,
                 cmap=cmap,
-                extend="both",
             )
             fig.colorbar(cm, label="Altitude [m]", format=(lambda x, _: f"{x:.1f}"))
         if add_tracking:
