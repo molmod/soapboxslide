@@ -36,6 +36,7 @@ dynamic = ["version"]
 Documentation = "https://github.com/molmod/soapboxslide/"
 Issues = "https://github.com/molmod/soapboxslide/issues"
 Source = "https://github.com/molmod/soapboxslide/"
+Changelog = "https://github.com/molmod/soapboxslide/blob/main/CHANGELOG.md"
 
 [tool.setuptools]
 py-modules = ["soapboxslide"]

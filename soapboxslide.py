@@ -420,20 +420,27 @@ class Slide:
         ax.set_aspect("equal")
 
     def get_hits(
-        self, points: NDArray[float], stop: NDArray[float] | None = None, eps: float = 1e-6
+        self,
+        masses: NDArray[float],
+        points: NDArray[float],
+        stop: NDArray[float] | None = None,
+        eps: float = 1e-6,
     ) -> tuple[NDArray[bool], NDArray[int]]:
         """Return a boolean array with the targets that were hit.
 
         Parameters
         ----------
+        masses
+            An array with point masses with shape `(npoint,)`
         points
-            An array with shape `(nstep, ..., ncart)` with `ncart >= 2`.
+            An array with shape `(nstep, npoint, ncart)` with `ncart >= 2`.
             The first index represents a point of the trajectory and the last index
             corresponds to `x` and `y` coordinates, respectively.
             Intermediate indexes are allowed.
         stop
             Optionally, the stopping point identified by SciPy's `solve_ivp`.
             This is used for (double)checking the last waypoint.
+            Shape `(npoint, ncart)`.
         eps
             Error tolerance.
 
@@ -443,21 +450,21 @@ class Slide:
             A boolean array with shape `(nwaypoint,)`. hit = `True`, miss = `False`.
         best
             An integer array with shape `(nwaypoint,)`.
-            The indexes in the given `points` array that come closest to the corresponding waypoint.
+            The time indexes in the given `points` array that come closest
+            to the corresponding waypoint.
         """
         hits = np.zeros(len(self.waypoints), dtype=bool)
         best = np.zeros(len(self.waypoints), dtype=int)
-        nstep = points.shape[0]
+        weights = masses / masses.sum()
+        com = np.einsum("p,tpc->tc", weights, points[:, :, :2])
         for i, waypoint in enumerate(self.waypoints[:, :2]):
-            distances = np.linalg.norm(points[..., :2] - waypoint, axis=-1)
-            distances = distances.reshape(nstep, -1).min(axis=1)
+            distances = np.linalg.norm(com - waypoint, axis=1)
             best[i] = np.argmin(distances)
             if distances[best[i]] <= self.target_radius + eps:
                 hits[i] = True
         if stop is not None:
-            distance = np.linalg.norm(stop[..., :2] - self.waypoints[-1, :2], axis=-1)
-            if distance.ndim > 0:
-                distance = distance.min()
+            stop_com = np.dot(weights, stop[:, :2])
+            distance = np.linalg.norm(stop_com - self.waypoints[-1, :2])
             if distance <= self.target_radius + eps:
                 hits[-1] = True
         return hits, best

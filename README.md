@@ -116,6 +116,13 @@ In addition, a `Slide` instance has the following attributes:
 
 Note that the above surface plots show dashed circles centered on the waypoints, whose radius is the target radius.
 
+The `Slide` class also features two potentially useful methods:
+
+- `Slide.plot` can be used to prepare a drawing of the slide on which one can overlay additional results.
+- `Slide.get_hits` can be used to check which waypoints were reached by a given trajectory.
+
+Consult their respective docstrings for more information on how to use these methods.
+
 ## Storing and Sharing Trajectory Data
 
 The `soapboxslide` module also implements a `Trajectory` class for storing the results of a numerical integration of one or more particles sliding over the surface.
