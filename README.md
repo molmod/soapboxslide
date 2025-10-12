@@ -21,6 +21,9 @@ and visualizes the slides [`boxcar_blitz.toml`](boxcar_blitz.toml) and [`brutal_
 
 Your eyes may need some time to adapt to the correct depth perception: black ridges are high-altitude separations between the colored valleys.
 
+Note that the starting point and the finish are denoted as green and red circles respectively.
+All other circles are waypoints that must be reached on the way down.
+
 ## Concept
 
 The idea is for students to use the surface implemented in `soapboxslide` to simulate the dynamics of a particle (or a connected set of particles) sliding down.

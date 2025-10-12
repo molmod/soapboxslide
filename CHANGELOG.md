@@ -8,6 +8,11 @@ and this project adheres to [Effort-based Versioning](https://jacobtomlinson.dev
 
 (no changes yet)
 
+### Changed
+
+- Improved README.
+- Improved clarity of first and last target.
+
 ## [1.0.0] - 2025-10-11
 
 Initial release, just to get things started.

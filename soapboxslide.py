@@ -400,22 +400,19 @@ class Slide:
             )
             ax.plot(self.waypoints[:, 0], self.waypoints[:, 1], "ko", ms=10, zorder=3)
         if add_targets:
-            colors = {0: "g", len(self.waypoints) - 1: "r"}
+            target_colors = {0: "g", len(self.waypoints) - 1: "r"}
             for i, waypoint in enumerate(self.waypoints):
-                color = colors.get(i, "w")
-                alpha = 0.7 if color == "w" else 1.0
-                ax.add_patch(
-                    plt.Circle(
-                        waypoint,
-                        self.target_radius,
-                        color="none",
-                        ec=color,
-                        lw=2,
-                        ls=":",
-                        zorder=4,
-                        alpha=alpha,
-                    )
+                circle = plt.Circle(
+                    waypoint,
+                    self.target_radius,
+                    color=target_colors.get(i, "none"),
+                    ec="w",
+                    lw=2,
+                    ls=":",
+                    zorder=4,
+                    alpha=0.5,
                 )
+                ax.add_patch(circle)
         ax.set_xlim(0, self.width)
         ax.set_ylim(0, self.height)
         ax.set_xlabel("x [m]")
