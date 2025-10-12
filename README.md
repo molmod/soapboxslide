@@ -4,6 +4,7 @@ This Python package is written by Toon Verstraelen for students of the course
 ["Python for Scientists" (C004212)](http://studiekiezer.ugent.be/studiefiche/en/C004212/2025)
 of the [B.Sc. Physics and Astronomy](https://studiekiezer.ugent.be/2026/bachelor-of-science-in-physics-and-astronomy)
 at [Ghent University](https://www.ugent.be/).
+It is distributed under the conditions of the [GPLv3 license](./LICENSE).
 
 ## Quick Start
 
