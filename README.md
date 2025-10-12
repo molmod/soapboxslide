@@ -15,14 +15,13 @@ pip install soapboxslide
 ```
 
 This module implements a 2D surface that resembles a curved slide, suitable for computational soapbox racing.
-To give you a quick idea, the following figure is created with the [`plot.py`](plot.py) script in this repository,
-and visualizes the slides [`boxcar_blitz.toml`](boxcar_blitz.toml) and [`brutal_bends.toml`](brutal_bends.toml) included in this repository:
+To give you a quick idea, the following figure is created with the [`plot.py`](plot.py) script in this repository, and visualizes the slides [`boxcar_blitz.toml`](boxcar_blitz.toml) and [`brutal_bends.toml`](brutal_bends.toml) included in this repository:
 
 ![slides.jpg](https://raw.githubusercontent.com/molmod/soapboxslide/main/slides.jpg)
 
 Your eyes may need some time to adapt to the correct depth perception: black ridges are high-altitude separations between the colored valleys.
 
-Note that the starting point and the finish are denoted as green and red circles respectively.
+Note that the starting point and the finish are denoted as green and red circles, respectively.
 All other circles are waypoints that must be reached on the way down.
 
 ## Concept
@@ -37,9 +36,9 @@ In this case, equations of motion can be derived using a Lagrangian, possibly wi
 
 2. A more challenging scenario (not used for now, but closer in spirit to real soap box races) is to impose inequality constraints, allowing particles to detach from the surface.
 
-## Slide Class Usage
+## `Slide` Class Usage
 
-One can load a surface from a TOML file and calculate slide properties at a given point, e.g. $x=5$ and $y=38$, as follows:
+One can load a surface from a [TOML](https://toml.io/en/) file and calculate slide properties at a given point, e.g. $x=5$ and $y=38$, as follows:
 
 ```python
 import numpy as np
@@ -112,7 +111,7 @@ In addition, a `Slide` instance has the following attributes:
   defining the shape and altitude of the slide track.
   These are also intended as points that must be visited by a particle or a system sliding down,
   to ensure that it followed a legitimate trajectory.
-- `target_radius`: a required proximity between a particle (or the center of mass of a system of particles) to a waypoint, to mark the waypoint as properly visited.
+- `target_radius`: a required proximity between a particle (or the center of mass of a system of particles) to a waypoint, to mark this waypoint as properly visited.
   The distance is only measured in the $xy$-plane.
 
 Note that the above surface plots show dashed circles centered on the waypoints, whose radius is the target radius.
@@ -120,8 +119,8 @@ Note that the above surface plots show dashed circles centered on the waypoints,
 ## Storing and Sharing Trajectory Data
 
 The `soapboxslide` module also implements a `Trajectory` class for storing the results of a numerical integration of one or more particles sliding over the surface.
-This class performs an initial validation on your trajectory data upon construction.
-It also features `to_file` and `from_file` methods with which trajectories can be saved to and loaded from NPZ files.
+This class performs an initial validation of the trajectory data upon construction.
+It also features `to_file` and `from_file` methods with which trajectories can be dumped to and loaded from NPZ files.
 This is useful if you want to share your trajectory with someone, e.g. for review, and to implement separate computation and visualization scripts (or notebooks).
 
 To use the `Trajectory` class, create an instance as follows after completing the numerical integration of the equations of motion:
@@ -150,12 +149,12 @@ Some guidelines:
 
 - If there are no springs yet, use arrays with zero rows for the spring definitions.
 - If there is just one particle, several arrays will have a size 1 axis, i.e. `npoint=1`.
-- You can first store all fields in a dictionary, e.g. `data` and optionally add the `stop_*` fields to the dictionary. The trajectory is then created with `Trajectory(**data)`.
-- The EndState enumeration can be specified to indicate when the numerical integration has ended:
-  - `EndState.STOP`: last target was reached in time
-  - `EndState.CRASH`: the numerical integration failed (e.g. due to Inf or Nan results)
-  - `EndState.FAR`: the particle moved more than 5 m out of the arena
-  - `EndState.TIMEOUT`: the maximum time, e.g. 60 s, was reached
-- You will get a `TypeError` or `ValueError` when creating the trajectory if some of the data does not meet some basic requirements.
+- You can first store all fields in a dictionary, e.g. `data = {"time": ..., ...}` and optionally add the `stop_*` fields to the dictionary. The trajectory is then created with `Trajectory(**data)`.
+- The end state can be specified to indicate when the numerical integration has ended, using one of the `EndState` instances defined in the `soapboxslide` module:
+  - `EndState.STOP`: last target was reached in time.
+  - `EndState.CRASH`: the numerical integration failed (e.g. due to Inf or Nan results).
+  - `EndState.FAR`: the particle moved more than 5 m out of the arena.
+  - `EndState.TIMEOUT`: the maximum time, e.g. 60 s, was reached.
+- When creating a `Trajectory` instance, you will get a `TypeError` or `ValueError` if some of the data do not meet basic expectations.
 
 The meaning of and requirements for all attributes is further elaborated in the docstrings in [`soapboxslide.py`](soapboxslide.py).
