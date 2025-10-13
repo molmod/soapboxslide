@@ -27,23 +27,23 @@ To give you a quick idea, the following figure is created with the [`plot.py`](p
 Your eyes may need some time to adapt to the correct depth perception: black ridges are high-altitude separations between the colored valleys.
 
 Note that the starting point and the finish are denoted as green and red circles, respectively.
-All other circles are waypoints that must be reached on the way down.
+All other circles are waypoints that must be visited on the way down.
 
 ## Concept
 
 The idea is for students to use the surface implemented in `soapboxslide` to simulate the dynamics of a particle (or a connected set of particles) sliding down.
-In addition to correctly implementing the dynamics, students must do so as quickly as possible without missing any of the waypoints shown as dotted circles.
+In addition to correctly implementing the dynamics, students are instructed to find the physical parameters that allow the point mass(es) to reach the final target as quickly as possible, without missing any of the intermediate waypoints.
 
 Two classes of physical models can be considered:
 
 1. The most convenient is to assume a model of point particles strictly bound to the surface with holonomic constraints.
 In this case, equations of motion can be derived using a Lagrangian, possibly with a generalized force to include non-conservative friction forces.
 
-2. A more challenging scenario (not used for now, but closer in spirit to real soap box races) is to impose inequality constraints, allowing particles to detach from the surface.
+2. A more challenging scenario (not used for now, but closer in spirit to real soap box races) is to impose inequality constraints, allowing particles to fly over the surface.
 
 ## `Slide` Class Usage
 
-One can load a surface from a [TOML](https://toml.io/en/) file and calculate slide properties at a given point, e.g. $x=5$ and $y=38$, as follows:
+You can load a slide surface from a [TOML](https://toml.io/en/) file and calculate slide properties at a given point, e.g. $x=5$ and $y=38$, as follows:
 
 ```python
 import numpy as np
