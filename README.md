@@ -32,7 +32,7 @@ All other circles are waypoints that must be visited on the way down.
 ## Concept
 
 The idea is for students to use the surface implemented in `soapboxslide` to simulate the dynamics of a particle (or a connected set of particles) sliding down.
-In addition to correctly implementing the dynamics, students are instructed to find the physical parameters that allow the point mass(es) to reach the final target as quickly as possible, without missing any of the intermediate waypoints.
+In addition to correctly implementing the dynamics, students are instructed to find the physical parameters for which the point mass(es) to reach the final target as quickly as possible, without missing any of the intermediate waypoints.
 
 Two classes of physical models can be considered:
 
@@ -123,10 +123,31 @@ Note that the above surface plots show dashed circles centered on the waypoints,
 
 The `Slide` class also features two potentially useful methods:
 
-- `Slide.plot` can be used to prepare a drawing of the slide on which one can overlay additional results.
 - `Slide.get_hits` can be used to check which waypoints were reached by a given trajectory.
+- `Slide.plot` can be used to prepare a drawing of the slide on which one can overlay additional results.
+  It supports several keyword arguments to customize the surface.
 
-Consult their respective docstrings for more information on how to use these methods.
+This is a minimal example using the `Slide.plot` method, to which one can easily add more matplotlib code:
+
+```python
+import matplotlib.pyplot as plt
+
+from soapboxslide import Slide
+
+# Prepare plot with slide surface
+slide = Slide.from_file("boxcar_blitz.toml")
+fig, ax = plt.subplots(figsize=(8, 7))
+slide.plot(fig, ax)
+
+# Customize plot
+ax.set(title="You can put here whatever you want")
+ax.plot([5.0, 20.0, 9.0], [36.0, 1.0, 5.0], "g-", lw=4)
+
+# Save
+fig.savefig("myplot.jpg")
+```
+
+Consult the docstrings for more information on how to use the `get_hits` and `plot` methods.
 
 ## Storing and Sharing Trajectory Data
 
