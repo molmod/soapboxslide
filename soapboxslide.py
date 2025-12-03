@@ -692,9 +692,9 @@ class Trajectory:
         data = attrs.asdict(self)
         data["end_state"] = self.end_state.value
         data = {key: value for key, value in data.items() if value is not None}
-        np.savez_compressed(path_npz, **data, allow_pickle=False)
+        np.savez_compressed(str(path_npz), **data, allow_pickle=False)
 
     @classmethod
     def from_file(cls, path_npz):
-        data = np.load(path_npz)
+        data = np.load(str(path_npz))
         return cls(**data)

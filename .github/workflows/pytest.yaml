@@ -1,0 +1,34 @@
+name: pytest
+on:
+  push:
+    branches:
+      # Run tests for change on the main branch ...
+      - main
+    tags-ignore:
+      # ... but not for tags (avoids duplicate work).
+      - '**'
+  pull_request:
+    branches:
+      # Run tests for PRs targeting the main branch.
+      - main
+
+jobs:
+  tests:
+    strategy:
+      matrix:
+        os: [ubuntu-latest, macos-latest, windows-latest]
+        python-version: ["3.13", "3.14"]
+    runs-on: ${{ matrix.os }}
+    steps:
+      - uses: actions/checkout@v4
+      - name: Set up Python ${{ matrix.python-version }}
+        uses: actions/setup-python@v5
+        with:
+          python-version: ${{ matrix.python-version }}
+      - name: Install oldest versions of supported dependencies
+        if: ${{ matrix.python-version == '3.13'}}
+        run: pip install -r .github/requirements-old.txt
+      - name: Install package with test dependencies
+        run: pip install -e .[tests]
+      - name: Run pytest
+        run: pytest -vv

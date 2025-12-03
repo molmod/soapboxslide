@@ -24,6 +24,7 @@ classifiers = [
     "Topic :: Scientific/Engineering :: Physics",
 ]
 dependencies = [
+    # Ensure changes to these dependencies are reflected in .github/requirements-old.txt
     "attrs>=24.2.0",
     "cattrs>=24.1.1",
     "numpy>=2.3.1",
@@ -31,6 +32,11 @@ dependencies = [
     "matplotlib>=3.10.3",
 ]
 dynamic = ["version"]
+
+[project.optional-dependencies]
+tests = [
+    "pytest",
+]
 
 [project.urls]
 Documentation = "https://github.com/molmod/soapboxslide/"
