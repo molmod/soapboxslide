@@ -348,22 +348,22 @@ class Slide:
             fig.colorbar(cm, label="Altitude [m]", format=(lambda x, _: f"{x:.1f}"))
         if add_tracking:
             ax.contour(
-                xg, yg, track_y, levels=np.arange(-3, 4), colors="k", linewidths=1, alpha=0.5
+                xg, yg, track_y, levels=np.arange(-3, 4), colors="w", linewidths=1, alpha=0.2
             )
             ax.contour(
                 xg,
                 yg,
                 track_x,
                 levels=np.arange(-10, self.path_lengths[-1] + 10),
-                colors="k",
+                colors="w",
                 linewidths=1,
-                alpha=0.5,
+                alpha=0.2,
             )
         if add_hillshade:
             # Compute hillshading using a finite difference filter
             altitude_dx = (altitude[1:-1, 2:] - altitude[1:-1, :-2]) / (2 * xspacing)
             altitude_dy = (altitude[2:, 1:-1] - altitude[:-2, 1:-1]) / (2 * yspacing)
-            source = np.array([-1.0, 1.0, 0.0])
+            source = np.array([-1.0, 1.0, 0.35])
             source /= np.linalg.norm(source)
             cosine = (-source[0] * altitude_dx - source[1] * altitude_dy + source[2]) / np.sqrt(
                 altitude_dx**2 + altitude_dy**2 + 1
@@ -406,11 +406,11 @@ class Slide:
                     waypoint,
                     self.target_radius,
                     color=target_colors.get(i, "none"),
-                    ec="w",
+                    ec="k",
                     lw=2,
                     ls=":",
                     zorder=4,
-                    alpha=0.5,
+                    alpha=0.7,
                 )
                 ax.add_patch(circle)
         ax.set_xlim(0, self.width)

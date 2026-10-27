@@ -6,7 +6,11 @@ and this project adheres to [Effort-based Versioning](https://jacobtomlinson.dev
 
 ## [Unreleased]
 
-(no changes yet)
+Improved graphics.
+
+### Fixed
+
+- The plotting code has been tweaked to make the depth perception more intuitive.
 
 ## [1.0.2] - 2025-10-12
 
