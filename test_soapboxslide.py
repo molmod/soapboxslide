@@ -25,7 +25,7 @@ import numpy as np
 from soapboxslide import EndState, Trajectory
 
 
-def test_npz_trajectory(tmpdir):
+def test_npz_trajectory(tmp_path):
     traj = Trajectory(
         time=[0, 1, 2],
         mass=[1, 1.2],
@@ -57,9 +57,8 @@ def test_npz_trajectory(tmpdir):
         stop_pos=[[10, 0, 0], [10, 1, 0]],
         stop_vel=[[0, 0, 0], [0, 0, 0]],
     )
-    path = tmpdir.join("trajectory.npz")
+    path = tmp_path / "trajectory.npz"
     traj.to_file(path)
-    print(path)
     loaded_traj = Trajectory.from_file(path)
 
     for attr in attrs.fields(Trajectory):

@@ -29,11 +29,17 @@ import numpy as np
 import scipy as sp
 from numpy.typing import NDArray
 
-__all__ = ("STANDARD_GRAVITY", "EndState", "Slide", "Trajectory")
+__all__ = ("FAR_MARGIN", "MAX_TIME", "STANDARD_GRAVITY", "EndState", "Slide", "Trajectory")
 
 
 MAX_TIME = 60.0
+"""Maximum simulation time [s] before the integration ends with `EndState.TIMEOUT`."""
+
+FAR_MARGIN = 5.0
+"""Distance [m] outside the arena beyond which the integration ends with `EndState.FAR`."""
+
 STANDARD_GRAVITY = 9.81
+"""Standard gravitational acceleration [m/s²]."""
 
 HILLSHADE = mcolors.LinearSegmentedColormap.from_list(
     "hillshade",
@@ -347,9 +353,7 @@ class Slide:
             )
             fig.colorbar(cm, label="Altitude [m]", format=(lambda x, _: f"{x:.1f}"))
         if add_tracking:
-            ax.contour(
-                xg, yg, track_y, levels=np.arange(-3, 4), colors="w", linewidths=1, alpha=0.2
-            )
+            ax.contour(xg, yg, track_y, levels=np.arange(1, 4), colors="w", linewidths=1, alpha=0.2)
             ax.contour(
                 xg,
                 yg,
@@ -484,10 +488,10 @@ class EndState(Enum):
     """Some floating point issue that forced the integrator to give up."""
 
     FAR = 3
-    """The integration led to a position far (more than 5 m) outside the arena."""
+    """The integration led to a position far (more than `FAR_MARGIN`) outside the arena."""
 
     TIMEOUT = 4
-    """The final target could not be reached in 60 seconds."""
+    """The final target could not be reached within `MAX_TIME`."""
 
 
 def _validate_ntime(instance, attribute, index, size):
@@ -535,7 +539,7 @@ class Trajectory:
     @time.validator
     def _validate_time(self, attribute, value):
         if (np.diff(value) < 0).any():
-            raise ValueError("Time should always increase.")
+            raise ValueError("Time must not decrease.")
 
     mass: NDArray[float] = attrs.field(
         converter=to_array(float),
@@ -693,6 +697,14 @@ class Trajectory:
             raise ValueError("The stop_time is specified without a stop_vel.")
 
     def to_file(self, path_npz):
+        """Write the trajectory to an NPZ file.
+
+        Parameters
+        ----------
+        path_npz
+            The path of the NPZ file to write.
+            Optional fields that are `None` are not stored.
+        """
         data = attrs.asdict(self)
         data["end_state"] = self.end_state.value
         data = {key: value for key, value in data.items() if value is not None}
@@ -700,5 +712,17 @@ class Trajectory:
 
     @classmethod
     def from_file(cls, path_npz):
-        data = np.load(str(path_npz))
-        return cls(**data)
+        """Load a trajectory from an NPZ file, e.g. one written with `to_file`.
+
+        Parameters
+        ----------
+        path_npz
+            The path of the NPZ file to read.
+
+        Returns
+        -------
+        trajectory
+            A validated `Trajectory` instance.
+        """
+        with np.load(str(path_npz)) as data:
+            return cls(**data)

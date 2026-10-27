@@ -186,8 +186,11 @@ Some guidelines:
 - The end state can be specified to indicate when the numerical integration has ended, using one of the `EndState` instances defined in the `soapboxslide` module:
   - `EndState.STOP`: last target was reached in time.
   - `EndState.CRASH`: the numerical integration failed (e.g. due to Inf or NaN results).
-  - `EndState.FAR`: the particle moved more than 5 m out of the arena.
-  - `EndState.TIMEOUT`: the maximum time, e.g. 60 s, was reached.
+  - `EndState.FAR`: the particle moved more than `FAR_MARGIN` (5 m) out of the arena.
+  - `EndState.TIMEOUT`: the maximum time `MAX_TIME` (60 s) was reached.
+
+  Import these constants, e.g. `from soapboxslide import FAR_MARGIN, MAX_TIME`,
+  instead of hard-coding the values, so that all simulations use the same limits.
 - When creating a `Trajectory` instance, you will get a `TypeError` or `ValueError` if some of the data do not meet basic expectations.
 
 The meaning of and requirements for all attributes are further elaborated in the docstrings in [`soapboxslide.py`](soapboxslide.py).

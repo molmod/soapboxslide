@@ -11,6 +11,10 @@ Improved graphics.
 ### Changed
 
 - `Slide.get_hits` also accepts lists (or other array-like inputs) for `masses`, `points` and `stop`.
+- The constants `MAX_TIME` (60 s) and `FAR_MARGIN` (5 m) are exported and documented,
+  so that all simulations use the same limits for `EndState.TIMEOUT` and `EndState.FAR`.
+- The `Trajectory` time validator now reports "Time must not decrease.",
+  matching the check, which allows equal consecutive times.
 
 ### Fixed
 
