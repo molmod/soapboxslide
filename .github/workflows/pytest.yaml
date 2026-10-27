@@ -11,6 +11,8 @@ on:
       # ... and only if relevant files have changed.
       - soapboxslide.py
       - test_soapboxslide.py
+      - boxcar_blitz.toml
+      - brutal_bends.toml
       - pyproject.toml
       - .github/workflows/pytest.yaml
   pull_request:
@@ -19,6 +21,8 @@ on:
       # ... only if relevant files have changed.
       - soapboxslide.py
       - test_soapboxslide.py
+      - boxcar_blitz.toml
+      - brutal_bends.toml
       - pyproject.toml
       - .github/workflows/pytest.yaml
 
