@@ -1,7 +1,7 @@
 # SPDX-FileCopyrightText: 2025 Toon Verstraelen <Toon.Verstraelen@UGent.be>
 # SPDX-License-Identifier: GPL-3.0-or-later
 [build-system]
-requires = ["setuptools>=65.0", "setuptools_scm>=8.1"]
+requires = ["setuptools>=77.0", "setuptools_scm>=8.1"]
 build-backend = "setuptools.build_meta"
 
 [project]
@@ -9,25 +9,42 @@ name = "soapboxslide"
 authors = [
   { name="Toon Verstraelen", email="toon.verstraelen@ugent.be" },
 ]
-description = "A Computational Soap Box Slide"
+description = "A 2D slide surface for computational soap box racing in physics education"
 readme = "README.md"
 license = "GPL-3.0-or-later"
 requires-python = ">=3.11"
+keywords = [
+    "soapbox",
+    "soap box racing",
+    "physics education",
+    "teaching",
+    "classical mechanics",
+    "Lagrangian mechanics",
+    "holonomic constraints",
+    "equations of motion",
+    "numerical integration",
+    "automatic differentiation",
+    "jax",
+    "autograd",
+]
 classifiers = [
     "Development Status :: 4 - Beta",
-    "Environment :: Console",
     "Intended Audience :: Education",
-    "Operating System :: POSIX",
+    "Intended Audience :: Science/Research",
+    "Natural Language :: English",
+    "Operating System :: OS Independent",
     "Programming Language :: Python :: 3",
+    "Programming Language :: Python :: 3 :: Only",
     "Programming Language :: Python :: 3.11",
     "Programming Language :: Python :: 3.12",
     "Programming Language :: Python :: 3.13",
     "Programming Language :: Python :: 3.14",
+    "Topic :: Education",
     "Topic :: Scientific/Engineering :: Physics",
+    "Topic :: Scientific/Engineering :: Visualization",
 ]
 dependencies = [
     "attrs>=24.2.0",
-    "cattrs>=24.1.1",
     "numpy>=2.3.1",
     "scipy>=1.16.0",
     "matplotlib>=3.10.3",
@@ -40,9 +57,10 @@ tests = [
 ]
 
 [project.urls]
-Documentation = "https://github.com/molmod/soapboxslide/"
+Homepage = "https://github.com/molmod/soapboxslide"
+Documentation = "https://github.com/molmod/soapboxslide#readme"
 Issues = "https://github.com/molmod/soapboxslide/issues"
-Source = "https://github.com/molmod/soapboxslide/"
+Source = "https://github.com/molmod/soapboxslide"
 Changelog = "https://github.com/molmod/soapboxslide/blob/main/CHANGELOG.md"
 
 [tool.setuptools]

@@ -25,6 +25,9 @@ The slide surfaces change slightly, so this release gets a meso version bump (1.
   so that all simulations use the same limits for `EndState.TIMEOUT` and `EndState.FAR`.
 - The `Trajectory` time validator now reports "Time must not decrease.",
   matching the check, which allows equal consecutive times.
+- Removed the unused `cattrs` dependency.
+- Improved package metadata (keywords, classifiers, project URLs)
+  and made the links in the README file absolute, so they also work on PyPI.
 
 ### Fixed
 

@@ -5,16 +5,21 @@ SPDX-License-Identifier: GPL-3.0-or-later
 
 # A Computational Soap Box Slide
 
+[![pytest](https://github.com/molmod/soapboxslide/actions/workflows/pytest.yaml/badge.svg)](https://github.com/molmod/soapboxslide/actions/workflows/pytest.yaml)
 [![release](https://github.com/molmod/soapboxslide/actions/workflows/release.yaml/badge.svg)](https://github.com/molmod/soapboxslide/actions/workflows/release.yaml)
+[![pre-commit.ci status](https://results.pre-commit.ci/badge/github/molmod/soapboxslide/main.svg)](https://results.pre-commit.ci/latest/github/molmod/soapboxslide/main)
+[![Ruff](https://img.shields.io/endpoint?url=https://raw.githubusercontent.com/astral-sh/ruff/main/assets/badge/v2.json)](https://github.com/astral-sh/ruff)
 [![PyPI Version](https://img.shields.io/pypi/v/soapboxslide)](https://pypi.org/project/soapboxslide/)
-![PyPI - Python Version](https://img.shields.io/pypi/pyversions/soapboxslide)
-![GPL-3 License](https://img.shields.io/github/license/molmod/soapboxslide)
+[![PyPI - Python Version](https://img.shields.io/pypi/pyversions/soapboxslide)](https://pypi.org/project/soapboxslide/)
+[![PyPI Downloads](https://img.shields.io/pypi/dm/soapboxslide)](https://pypistats.org/packages/soapboxslide)
+[![GPL-3 License](https://img.shields.io/github/license/molmod/soapboxslide)](https://github.com/molmod/soapboxslide/blob/main/LICENSE)
+
 
 This Python package is written by Toon Verstraelen for students of the course
 ["Scientific Computing for Physicists" (C004649)](https://studiekiezer.ugent.be/2026/studiefiche/en/C004649)
 of the [B.Sc. Physics and Astronomy](https://studiekiezer.ugent.be/2026/bachelor-of-science-in-physics-and-astronomy)
 at [Ghent University](https://www.ugent.be/).
-It is distributed under the conditions of the [GPLv3 license](./LICENSE).
+It is distributed under the conditions of the [GPLv3 license](https://github.com/molmod/soapboxslide/blob/main/LICENSE).
 
 ## Quick Start
 
@@ -25,7 +30,7 @@ pip install soapboxslide
 ```
 
 This module implements a 2D surface that resembles a curved slide, suitable for computational soapbox racing.
-To give you a quick idea, the following figure is created with the [`plot.py`](plot.py) script in this repository, and visualizes the slides [`boxcar_blitz.toml`](boxcar_blitz.toml) and [`brutal_bends.toml`](brutal_bends.toml) included in this repository:
+To give you a quick idea, the following figure is created with the [`plot.py`](https://github.com/molmod/soapboxslide/blob/main/plot.py) script in this repository, and visualizes the slides [`boxcar_blitz.toml`](https://github.com/molmod/soapboxslide/blob/main/boxcar_blitz.toml) and [`brutal_bends.toml`](https://github.com/molmod/soapboxslide/blob/main/brutal_bends.toml) included in this repository:
 
 ![slides.jpg](https://raw.githubusercontent.com/molmod/soapboxslide/main/slides.jpg)
 
@@ -198,4 +203,4 @@ Some guidelines:
   instead of hard-coding the values, so that all simulations use the same limits.
 - When creating a `Trajectory` instance, you will get a `TypeError` or `ValueError` if some of the data do not meet basic expectations.
 
-The meaning of and requirements for all attributes are further elaborated in the docstrings in [`soapboxslide.py`](soapboxslide.py).
+The meaning of and requirements for all attributes are further elaborated in the docstrings in [`soapboxslide.py`](https://github.com/molmod/soapboxslide/blob/main/soapboxslide.py).
