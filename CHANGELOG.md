@@ -8,6 +8,10 @@ and this project adheres to [Effort-based Versioning](https://jacobtomlinson.dev
 
 Improved graphics.
 
+### Changed
+
+- `Slide.get_hits` also accepts lists (or other array-like inputs) for `masses`, `points` and `stop`.
+
 ### Fixed
 
 - The plotting code has been tweaked to make the depth perception more intuitive.

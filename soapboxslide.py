@@ -431,7 +431,7 @@ class Slide:
         Parameters
         ----------
         masses
-            A NumPy array with point masses with shape `(npoint,)`.
+            An array with point masses with shape `(npoint,)`.
         points
             An array with shape `(nstep, npoint, ncart)` with `ncart >= 2`.
             The first index represents a time step of the trajectory,
@@ -453,6 +453,10 @@ class Slide:
             The time indexes in the given `points` array that come closest
             to the corresponding waypoint.
         """
+        masses = np.asarray(masses, dtype=float)
+        points = np.asarray(points, dtype=float)
+        if stop is not None:
+            stop = np.asarray(stop, dtype=float)
         hits = np.zeros(len(self.waypoints), dtype=bool)
         best = np.zeros(len(self.waypoints), dtype=int)
         weights = masses / masses.sum()
