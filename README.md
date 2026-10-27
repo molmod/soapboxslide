@@ -11,7 +11,7 @@ SPDX-License-Identifier: GPL-3.0-or-later
 ![GPL-3 License](https://img.shields.io/github/license/molmod/soapboxslide)
 
 This Python package is written by Toon Verstraelen for students of the course
-["Python for Scientists" (C004212)](http://studiekiezer.ugent.be/studiefiche/en/C004212/2025)
+["Scientific Computing for Physicists" (C004649)](https://studiekiezer.ugent.be/2026/studiefiche/en/C004649)
 of the [B.Sc. Physics and Astronomy](https://studiekiezer.ugent.be/2026/bachelor-of-science-in-physics-and-astronomy)
 at [Ghent University](https://www.ugent.be/).
 It is distributed under the conditions of the [GPLv3 license](./LICENSE).
