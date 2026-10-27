@@ -64,13 +64,13 @@ def has_shape(shape):
 
         - `None`, meaning that along this dimension there are no restrictions.
         - An integer item requires a specific size.
-        - A tuple item can be used to specify a range of a allowed sizes of
+        - A tuple item can be used to specify a range of allowed sizes of
           the form `(begin, end)` where `begin` and `end` are integers or `None`
           and `end` is inclusive. `None` can be used to specify the absence
           of an upper or lower bound of the range.
         - A function that receives the instance, attribute, index and size being
           checked. This can be used to enforce consistency between different array
-          attribtues.
+          attributes.
 
     Returns
     -------
@@ -83,7 +83,7 @@ def has_shape(shape):
     def validate(instance, attribute, value):
         if value.ndim != len(shape):
             raise ValueError(
-                f"The array {attribute.name} has the wrong dimensionalty: "
+                f"The array {attribute.name} has the wrong dimensionality: "
                 f"expected {len(shape)}, got {value.ndim}"
             )
         for i, req in enumerate(shape):
@@ -105,7 +105,7 @@ def has_shape(shape):
                     and (req[1] is None or value.shape[i] <= req[1])
                 ):
                     raise ValueError(
-                        f"The array {attribute.name} has an incorect size along axis {i}: "
+                        f"The array {attribute.name} has an incorrect size along axis {i}: "
                         f"expected in range {req}, got {value.shape[i]}"
                     )
             elif callable(req):
@@ -164,7 +164,7 @@ class Slide:
     """Array with waypoints defining the slide geometry.
 
     This is an array with shape `(npoint, 3)`, where `npoint` is the number of waypoints.
-    The collumns correspond to $x$, $y$ and $z$ coordinates of the bottom of slide.
+    The columns correspond to $x$, $y$ and $z$ coordinates of the bottom of the slide.
     """
 
     # Internal pre-computed attributes, derived from waypoints.
@@ -226,13 +226,13 @@ class Slide:
         npw
             A NumPy wrapper to use for array operations.
             This can be plain `numpy` if the only goal is to evaluate the altitude.
-            Use `autograd.numpy` or `jax.numpy` when using automatic differentation
+            Use `autograd.numpy` or `jax.numpy` when using automatic differentiation
             or other features from the `autograd` or `jax` libraries, respectively.
 
         Returns
         -------
         track_x
-            An estimate the distance along the slide,
+            An estimate of the distance along the slide,
             useful for tracking progress of the downhill trajectory.
         track_y
             An estimate of the distance orthogonal to the bottom of the slide,
@@ -253,7 +253,7 @@ class Slide:
     def compute(self, points, *, npw=np):
         """Low-level implementation of `__call__`.
 
-        The differences with `__call__` is that `points` must be a 2D array,
+        The difference with `__call__` is that `points` must be a 2D array,
         and the results are 1D arrays.
         """
         # Compute sample weights
@@ -308,7 +308,7 @@ class Slide:
             The number of levels in the altitude color scale.
         cmap
             The colormap to use for the altitudes.
-        add_altitude_full
+        add_altitude_fill
             Plot the altitude with filled contours.
         add_tracking
             Plot the tracking coordinates.
@@ -480,7 +480,7 @@ class EndState(Enum):
     """Some floating point issue that forced the integrator to give up."""
 
     FAR = 3
-    """The integration lead to a position far (more than 5 m) outside the arena."""
+    """The integration led to a position far (more than 5 m) outside the arena."""
 
     TIMEOUT = 4
     """The final target could not be reached in 60 seconds."""
@@ -506,19 +506,19 @@ def _validate_nspring(instance, attribute, index, size):
     if size != len(instance.spring_idx):
         raise ValueError(
             f"The number of springs in the {attribute.name} array does not match "
-            "the length number of springs in spring_idx. "
+            "the number of springs in spring_idx. "
             f"Expected {len(instance.spring_idx)}, got {size}."
         )
 
 
 @attrs.define
 class Trajectory:
-    """A container for trajectory objects. You must use this to create an NPZ file to be submitted.
+    """A container for trajectory data. You must use this to create an NPZ file to be submitted.
 
-    Note that this implementation already validate the shapes of the arrays.
+    Note that this implementation already validates the shapes of the arrays.
     It is designed to work for both single and multiple points on the surface.
 
-    Alle quantities must be stored in SI base units.
+    All quantities must be stored in SI base units.
     """
 
     time: NDArray[float] = attrs.field(
@@ -624,7 +624,7 @@ class Trajectory:
         if (value < 0).any():
             raise ValueError("The spring indexes must be zero or positive.")
         if (value >= len(self.mass)).any():
-            raise ValueError("Some spring indexes exceeed their maximum value (npoint - 1).")
+            raise ValueError("Some spring indexes exceed their maximum value (npoint - 1).")
 
     spring_par: NDArray[float] = attrs.field(
         converter=to_array(float),
@@ -681,7 +681,7 @@ class Trajectory:
         default=None,
         kw_only=True,
     )
-    """The velocities(s) of the point(s) when the final target was reached."""
+    """The velocity (or velocities) of the point(s) when the final target was reached."""
 
     @stop_vel.validator
     def _validate_stop_vel(self, attribute, value):

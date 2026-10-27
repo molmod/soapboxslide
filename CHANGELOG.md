@@ -11,6 +11,7 @@ Improved graphics.
 ### Fixed
 
 - The plotting code has been tweaked to make the depth perception more intuitive.
+- Typos in docstrings, error messages and the README file.
 
 ## [1.0.2] - 2025-10-12
 
@@ -19,7 +20,7 @@ Bug fixes.
 ### Fixed
 
 - The `Slide.get_hits` method now measures the distance from the center of mass to the waypoints.
-- Documentat `Slide.plot` and `Slide.get_hits` in the README file.
+- Document `Slide.plot` and `Slide.get_hits` in the README file.
 
 ## [1.0.1] - 2025-10-12
 

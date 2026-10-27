@@ -32,7 +32,7 @@ All other circles are waypoints that must be visited on the way down.
 ## Concept
 
 The idea is for students to use the surface implemented in `soapboxslide` to simulate the dynamics of a particle (or a connected set of particles) sliding down.
-In addition to correctly implementing the dynamics, students are instructed to find the physical parameters for which the point mass(es) to reach the final target as quickly as possible, without missing any of the intermediate waypoints.
+In addition to correctly implementing the dynamics, students are instructed to find the physical parameters for which the point mass(es) reach the final target as quickly as possible, without missing any of the intermediate waypoints.
 
 Two classes of physical models can be considered:
 
@@ -116,7 +116,7 @@ In addition, a `Slide` instance has the following attributes:
   defining the shape and altitude of the slide track.
   These are also intended as points that must be visited by a particle or a system sliding down,
   to ensure that it followed a legitimate trajectory.
-- `target_radius`: a required proximity between a particle (or the center of mass of a system of particles) to a waypoint, to mark this waypoint as properly visited.
+- `target_radius`: a required proximity between a particle (or the center of mass of a system of particles) and a waypoint, to mark this waypoint as properly visited.
   The distance is only measured in the $xy$-plane.
 
 Note that the above surface plots show dashed circles centered on the waypoints, whose radius is the target radius.
@@ -169,7 +169,7 @@ traj = Trajectory(
     hess=...,        # NDArray[float], shape = (ntime, npoint, 3), (h_xx, h_xy and h_yy derivatives)
     spring_idx=...,  # NDArray[int], shape = (nspring, 2), (each row is a pair of point indexes)
     spring_par=...,  # NDArray[float], shape = (nspring, 3), (force constant, rest length, damping coeff)
-    end_state=...,   # One of the EndState enumeration
+    end_state=...,   # One of the EndState members
     stop_time=...,   # Optional, time that last target was reached
     stop_pos=...,    # Optional, NDArray[float], shape = (npoint, 3), positions at stop time
     stop_vel=...,    # Optional, NDArray[float], shape = (npoint, 3), velocities at stop time
@@ -185,9 +185,9 @@ Some guidelines:
 - You can first store all fields in a dictionary, e.g. `data = {"time": ..., ...}` and optionally add the `stop_*` fields to the dictionary. The trajectory is then created with `Trajectory(**data)`.
 - The end state can be specified to indicate when the numerical integration has ended, using one of the `EndState` instances defined in the `soapboxslide` module:
   - `EndState.STOP`: last target was reached in time.
-  - `EndState.CRASH`: the numerical integration failed (e.g. due to Inf or Nan results).
+  - `EndState.CRASH`: the numerical integration failed (e.g. due to Inf or NaN results).
   - `EndState.FAR`: the particle moved more than 5 m out of the arena.
   - `EndState.TIMEOUT`: the maximum time, e.g. 60 s, was reached.
 - When creating a `Trajectory` instance, you will get a `TypeError` or `ValueError` if some of the data do not meet basic expectations.
 
-The meaning of and requirements for all attributes is further elaborated in the docstrings in [`soapboxslide.py`](soapboxslide.py).
+The meaning of and requirements for all attributes are further elaborated in the docstrings in [`soapboxslide.py`](soapboxslide.py).
