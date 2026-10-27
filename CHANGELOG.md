@@ -33,6 +33,8 @@ The slide surfaces change slightly, so this release gets a meso version bump (1.
 
 - The plotting code has been tweaked to make the depth perception more intuitive.
 - Altitude colors in `Slide.plot` are now aligned with the plotted coordinates.
+- Evaluating the slide far away from the track (more than ~50 m)
+  no longer returns NaN values.
 - Typos in docstrings, error messages and the README file.
 - Docstrings and README now match the code more closely.
 

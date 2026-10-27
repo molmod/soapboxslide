@@ -257,6 +257,9 @@ class Slide:
         # - all squared distance between path points and points where functions must be computed.
         deltas = self.controls[:, :2] - points.reshape(-1, 1, 2)
         dists_sq = npw.einsum("pca,pca->pc", deltas, deltas)
+        # - Subtracting the smallest squared distance cancels out after normalization,
+        #   but prevents all weights from underflowing to zero far away from the track.
+        dists_sq = dists_sq - dists_sq.min(axis=1).reshape(-1, 1)
         # - weights with shape (npoint, ncontrol), normalized each point over the controls.
         weights = npw.exp(-0.3 * dists_sq)
         weights /= weights.sum(axis=1).reshape(-1, 1)

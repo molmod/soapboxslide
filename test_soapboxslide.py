@@ -25,6 +25,15 @@ def test_readme_example():
 
 
 @pytest.mark.parametrize("name", SLIDE_FILES)
+@pytest.mark.filterwarnings("error")
+def test_far_from_track(name):
+    # Far from all control points, the weights must not underflow to zero (0/0 = NaN).
+    slide = Slide.from_file(ROOT / name)
+    result = slide(np.array([[200.0, -150.0], [-1e3, 1e3]]))
+    assert all(np.isfinite(item).all() for item in result)
+
+
+@pytest.mark.parametrize("name", SLIDE_FILES)
 def test_controls_endpoints(name):
     slide = Slide.from_file(ROOT / name)
     np.testing.assert_allclose(slide.controls[0], slide.waypoints[0])
