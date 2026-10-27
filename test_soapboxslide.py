@@ -35,6 +35,24 @@ def test_plot(name, tmp_path):
     fig.savefig(tmp_path / "slide.png")
 
 
+def test_plot_image_extent():
+    slide = Slide.from_file(ROOT / "boxcar_blitz.toml")
+    fig = Figure()
+    ax = fig.add_subplot()
+    spacing = 0.5
+    slide.plot(fig, ax, spacing=spacing, add_altitude_fill=True, add_hillshade=True)
+    nx = round(slide.width / spacing)
+    ny = round(slide.height / spacing)
+    dx = slide.width / nx
+    dy = slide.height / ny
+    # Pixel centers must coincide with the grid points 0, dx, ..., width (same for y).
+    expected = [-0.5 * dx, slide.width + 0.5 * dx, -0.5 * dy, slide.height + 0.5 * dy]
+    assert len(ax.images) == 2
+    for image in ax.images:
+        assert image.get_array().shape == (ny + 1, nx + 1)
+        np.testing.assert_allclose(image.get_extent(), expected)
+
+
 @pytest.fixture
 def straight_slide():
     return Slide(

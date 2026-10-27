@@ -324,12 +324,21 @@ class Slide:
         # Evaluate functions on grid points
         track_x, track_y, altitude = self(grid_points)
 
+        # Images exclude the padding and have their pixel centers on the grid points.
+        # The half-pixel border is cropped by set_xlim and set_ylim below.
+        extent = (
+            -0.5 * xspacing,
+            self.width + 0.5 * xspacing,
+            -0.5 * yspacing,
+            self.height + 0.5 * yspacing,
+        )
+
         # Plot the path, using a color code for the altitude
         if add_altitude_fill:
             cm = ax.imshow(
-                altitude,
+                altitude[1:-1, 1:-1],
                 origin="lower",
-                extent=(0, self.width, 0, self.height),
+                extent=extent,
                 vmin=alt_min,
                 vmax=alt_max,
                 cmap=cmap,
@@ -358,7 +367,7 @@ class Slide:
             ax.imshow(
                 cosine,
                 origin="lower",
-                extent=(0, self.width, 0, self.height),
+                extent=extent,
                 vmin=-1,
                 vmax=1,
                 cmap=HILLSHADE,

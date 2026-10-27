@@ -24,6 +24,7 @@ Improved graphics.
 ### Fixed
 
 - The plotting code has been tweaked to make the depth perception more intuitive.
+- Altitude colors in `Slide.plot` are now aligned with the plotted coordinates.
 - Typos in docstrings, error messages and the README file.
 - Docstrings and README now match the code more closely.
 
