@@ -23,10 +23,10 @@ It is distributed under the conditions of the [GPLv3 license](https://github.com
 
 ## Quick Start
 
-You can install the `soapboxslide` Python module with:
+You can install the latest `soapboxslide` Python module with:
 
 ```bash
-pip install soapboxslide
+pip install -U soapboxslide
 ```
 
 This module implements a 2D surface that resembles a curved slide, suitable for computational soapbox racing.
@@ -34,7 +34,8 @@ To give you a quick idea, the following figure is created with the [`plot.py`](h
 
 ![slides.jpg](https://raw.githubusercontent.com/molmod/soapboxslide/main/slides.jpg)
 
-Your eyes may need some time to adapt to the correct depth perception: black ridges are high-altitude separations between the colored valleys.
+Your eyes may need some time to adapt to the correct depth perception:
+white ridges are high-altitude separations between the colored valleys.
 
 Note that the starting point and the finish are denoted as green and red circles, respectively.
 All other circles are waypoints that must be visited on the way down.
@@ -74,7 +75,7 @@ This will show three results:
 These three values have the following meaning (in meter):
 
 1. The progress along the track.
-2. The orthogonal(ish) deviation from the bottom of the track.
+2. The orthogonal(ish) distance from the bottom of the track.
 3. The altitude of the track.
 
 The included slides are `"boxcar_blitz"` and `"brutal_bends"`.
@@ -89,12 +90,10 @@ The `slide()` function is fully vectorized: one may also provide an array of poi
 The `slide()` function optionally supports alternative NumPy wrappers, such as those of [JAX](https://docs.jax.dev/) and its predecessor [Autograd](https://github.com/HIPS/autograd).
 This allows for an efficient evaluation of analytical partial derivatives of the altitude.
 These libraries are not installed by default, but can be included with
-`pip install soapboxslide[jax]` or `pip install soapboxslide[autograd]`.
+`pip install -U "soapboxslide[jax]"` or `pip install -U "soapboxslide[autograd]"`.
 For example, a vectorized calculation of many gradients is implemented as follows:
 
 ```python
-from functools import partial
-
 import jax
 import jax.numpy as jnp
 import numpy as np
@@ -178,6 +177,8 @@ This is useful if you want to share your trajectory with someone, e.g. for revie
 To use the `Trajectory` class, create an instance as follows after completing the numerical integration of the equations of motion:
 
 ```python
+from soapboxslide import EndState, Trajectory
+
 traj = Trajectory(
     time=...,        # NDArray[float], shape = (ntime, )
     mass=...,        # NDArray[float], shape = (npoint, )
@@ -208,7 +209,7 @@ Some guidelines:
   - `EndState.FAR`: the particle moved more than `FAR_MARGIN` (5 m) out of the arena.
   - `EndState.TIMEOUT`: the maximum time `MAX_TIME` (60 s) was reached.
 
-  Import these constants, e.g. `from soapboxslide import FAR_MARGIN, MAX_TIME`,
+  Import these constants, e.g. `from soapboxslide import FAR_MARGIN, MAX_TIME, STANDARD_GRAVITY`
   instead of hard-coding the values, so that all simulations use the same limits.
 - When creating a `Trajectory` instance, you will get a `TypeError` or `ValueError` if some of the data do not meet basic expectations.
 
