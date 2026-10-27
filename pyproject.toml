@@ -52,6 +52,12 @@ dependencies = [
 dynamic = ["version"]
 
 [project.optional-dependencies]
+jax = [
+    "jax>=0.7.0",
+]
+autograd = [
+    "autograd>=1.8.0",
+]
 tests = [
     "pytest>=8.0",
 ]

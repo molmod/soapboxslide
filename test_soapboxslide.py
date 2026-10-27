@@ -33,6 +33,70 @@ def test_far_from_track(name):
     assert all(np.isfinite(item).all() for item in result)
 
 
+@pytest.fixture(params=["numpy", "jax", "autograd"])
+def npw_backend(request):
+    """Return a NumPy wrapper and its grad and hessian transformations (None for NumPy).
+
+    JAX and autograd tests are skipped if these libraries are not installed.
+    """
+    if request.param == "numpy":
+        yield np, None, None
+    elif request.param == "jax":
+        jax = pytest.importorskip("jax")
+        # Double precision is needed for a meaningful comparison.
+        # The original setting is restored afterwards, to avoid side effects on other tests.
+        x64_orig = jax.config.jax_enable_x64
+        jax.config.update("jax_enable_x64", True)
+        # Without jit, JAX is too slow because it dispatches every operation separately.
+        yield (
+            pytest.importorskip("jax.numpy"),
+            lambda func: jax.jit(jax.grad(func)),
+            lambda func: jax.jit(jax.hessian(func)),
+        )
+        jax.config.update("jax_enable_x64", x64_orig)
+    elif request.param == "autograd":
+        autograd = pytest.importorskip("autograd")
+        yield pytest.importorskip("autograd.numpy"), autograd.grad, autograd.hessian
+
+
+# Points near the start, near the track, between parts of the track and outside the arena.
+NPW_POINTS = np.array([[5.0, 38.0], [12.1, 7.3], [10.7, 25.5], [30.0, 20.0], [-3.0, 44.0]])
+
+
+@pytest.mark.parametrize("name", SLIDE_FILES)
+def test_npw_values(name, npw_backend):
+    npw, _, _ = npw_backend
+    slide = Slide.from_file(ROOT / name)
+    expected = slide(NPW_POINTS)
+    # Use a 3D input array to also test the vectorization over multiple axes.
+    points = npw.array(NPW_POINTS.reshape(5, 1, 2))
+    for item, item_expected in zip(slide(points, npw=npw), expected, strict=True):
+        assert item.shape == (5, 1)
+        np.testing.assert_allclose(np.asarray(item)[:, 0], item_expected, rtol=1e-12)
+
+
+@pytest.mark.parametrize("npw_backend", ["jax", "autograd"], indirect=True)
+@pytest.mark.parametrize("name", SLIDE_FILES)
+def test_npw_derivatives(name, npw_backend):
+    npw, grad, hessian = npw_backend
+    slide = Slide.from_file(ROOT / name)
+    alt_grad = grad(lambda point: slide(point, npw=npw)[2])
+    alt_hess = hessian(lambda point: slide(point, npw=npw)[2])
+    eps = 1e-5
+    for point in NPW_POINTS:
+        # Compare to central finite differences of the altitude (computed with plain NumPy)
+        # and of the gradient (computed with automatic differentiation).
+        grad_fd = np.zeros(2)
+        hess_fd = np.zeros((2, 2))
+        for i in range(2):
+            delta = np.zeros(2)
+            delta[i] = eps
+            grad_fd[i] = (slide(point + delta)[2] - slide(point - delta)[2]) / (2 * eps)
+            hess_fd[i] = (np.asarray(alt_grad(point + delta)) - alt_grad(point - delta)) / (2 * eps)
+        np.testing.assert_allclose(alt_grad(point), grad_fd, atol=1e-7, rtol=1e-7)
+        np.testing.assert_allclose(alt_hess(point), hess_fd, atol=1e-7, rtol=1e-7)
+
+
 @pytest.mark.parametrize("name", SLIDE_FILES)
 def test_controls_endpoints(name):
     slide = Slide.from_file(ROOT / name)

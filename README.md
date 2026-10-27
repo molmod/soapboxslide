@@ -81,6 +81,8 @@ The `slide()` function is fully vectorized: one may also provide an array of poi
 
 The `slide()` function optionally supports alternative NumPy wrappers, such as those of [JAX](https://docs.jax.dev/) and its predecessor [Autograd](https://github.com/HIPS/autograd).
 This allows for an efficient evaluation of analytical partial derivatives of the altitude.
+These libraries are not installed by default, but can be included with
+`pip install soapboxslide[jax]` or `pip install soapboxslide[autograd]`.
 For example, a vectorized calculation of many gradients is implemented as follows:
 
 ```python

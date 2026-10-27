@@ -74,9 +74,10 @@ jobs:
           enable-cache: true
           cache-dependency-glob: pyproject.toml
           cache-suffix: ${{ matrix.platform.python-version }}-${{ matrix.platform.resolution }}
-      - name: Install with the test dependencies
+      - name: Install with the test and optional dependencies
         timeout-minutes: 3
-        run: uv pip install --system --resolution ${{ matrix.platform.resolution }} -e .[tests]
+        # JAX and autograd are optional, but installed here so their tests are not skipped.
+        run: uv pip install --system --resolution ${{ matrix.platform.resolution }} -e .[tests,jax,autograd]
       - name: Run pytest
         timeout-minutes: 5
         run: pytest -vv

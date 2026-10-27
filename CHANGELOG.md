@@ -26,6 +26,9 @@ The slide surfaces change slightly, so this release gets a meso version bump (1.
 - The `Trajectory` time validator now reports "Time must not decrease.",
   matching the check, which allows equal consecutive times.
 - Removed the unused `cattrs` dependency.
+- Optional dependencies `jax` and `autograd`, installed with e.g. `pip install soapboxslide[jax]`.
+  Unit tests now verify that the slide works with plain NumPy, JAX and autograd,
+  including first and second derivatives computed with automatic differentiation.
 - Improved package metadata (keywords, classifiers, project URLs)
   and made the links in the README file absolute, so they also work on PyPI.
 
