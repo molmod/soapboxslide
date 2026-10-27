@@ -184,6 +184,7 @@ def test_npz_trajectory(tmp_path):
         val_orig = getattr(traj, attr.name)
         val_loaded = getattr(loaded_traj, attr.name)
         assert np.array_equal(val_orig, val_loaded)
+        assert type(val_orig) is type(val_loaded)
 
 
 def test_trajectory_repeated_time():

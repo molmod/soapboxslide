@@ -665,7 +665,11 @@ class Trajectory:
     because the last target was reached.
     """
 
-    stop_time: float | None = attrs.field(kw_only=True, default=None)
+    stop_time: float | None = attrs.field(
+        converter=attrs.converters.optional(float),
+        default=None,
+        kw_only=True,
+    )
     """If the last target was reached, specify its time here."""
 
     @stop_time.validator
