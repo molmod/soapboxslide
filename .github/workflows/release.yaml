@@ -14,7 +14,7 @@ on:
     paths:
       # Only run on main if relevant files have changed.
       # Path filters are not evaluated for tag pushes, so releases always run.
-      - soapboxslide.py
+      - soapboxslide/**
       - pyproject.toml
       - LICENSE
       - LICENSES/**

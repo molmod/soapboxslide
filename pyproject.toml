@@ -70,7 +70,7 @@ Source = "https://github.com/molmod/soapboxslide"
 Changelog = "https://github.com/molmod/soapboxslide/blob/main/CHANGELOG.md"
 
 [tool.setuptools]
-py-modules = ["soapboxslide"]
+packages = ["soapboxslide"]
 
 [tool.ruff]
 line-length = 100

@@ -11,20 +11,16 @@ on:
       - '**'
     paths:
       # ... and only if relevant files have changed.
-      - soapboxslide.py
+      - soapboxslide/**
       - test_soapboxslide.py
-      - boxcar_blitz.toml
-      - brutal_bends.toml
       - pyproject.toml
       - .github/workflows/pytest.yaml
   pull_request:
     # Run tests on pull requests ...
     paths:
       # ... only if relevant files have changed.
-      - soapboxslide.py
+      - soapboxslide/**
       - test_soapboxslide.py
-      - boxcar_blitz.toml
-      - brutal_bends.toml
       - pyproject.toml
       - .github/workflows/pytest.yaml
 

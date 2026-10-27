@@ -14,6 +14,14 @@ and this project adheres to [Effort-based Versioning](https://jacobtomlinson.dev
 Improved graphics and a corrected sampling of the slide track.
 The slide surfaces change slightly, so this release gets a meso version bump (1.1.0).
 
+### Added
+
+- The slides `boxcar_blitz` and `brutal_bends` are now included in the package
+  and can be loaded with `Slide.from_name("boxcar_blitz")`, without downloading TOML files.
+  This guarantees that everyone using the same version of `soapboxslide` gets the same slides.
+  To make this possible, `soapboxslide` is now a package instead of a single module.
+  `Slide.from_file` remains available for loading your own slides.
+
 ### Changed
 
 - Corrected the curvature estimate used to sample the slide track,

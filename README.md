@@ -30,7 +30,7 @@ pip install soapboxslide
 ```
 
 This module implements a 2D surface that resembles a curved slide, suitable for computational soapbox racing.
-To give you a quick idea, the following figure is created with the [`plot.py`](https://github.com/molmod/soapboxslide/blob/main/plot.py) script in this repository, and visualizes the slides [`boxcar_blitz.toml`](https://github.com/molmod/soapboxslide/blob/main/boxcar_blitz.toml) and [`brutal_bends.toml`](https://github.com/molmod/soapboxslide/blob/main/brutal_bends.toml) included in this repository:
+To give you a quick idea, the following figure is created with the [`plot.py`](https://github.com/molmod/soapboxslide/blob/main/plot.py) script in this repository, and visualizes the two slides included in the package, `boxcar_blitz` and `brutal_bends`:
 
 ![slides.jpg](https://raw.githubusercontent.com/molmod/soapboxslide/main/slides.jpg)
 
@@ -53,14 +53,15 @@ In this case, equations of motion can be derived using a Lagrangian, possibly wi
 
 ## `Slide` Class Usage
 
-You can load a slide surface from a [TOML](https://toml.io/en/) file and calculate slide properties at a given point, e.g. $x=5$ and $y=38$, as follows:
+You can load one of the slides included in the package by name
+and calculate slide properties at a given point, e.g. $x=5$ and $y=38$, as follows:
 
 ```python
 import numpy as np
 
 from soapboxslide import Slide
 
-slide = Slide.from_file("boxcar_blitz.toml")
+slide = Slide.from_name("boxcar_blitz")
 print(slide(np.array([5.0, 38.0])))
 ```
 
@@ -75,6 +76,12 @@ These three values have the following meaning (in meter):
 1. The progress along the track.
 2. The orthogonal(ish) deviation from the bottom of the track.
 3. The altitude of the track.
+
+The included slides are `"boxcar_blitz"` and `"brutal_bends"`.
+Because they are part of the package, everyone using the same version of `soapboxslide` gets exactly the same slides.
+Their definitions are [TOML](https://toml.io/en/) files in the
+[`soapboxslide/`](https://github.com/molmod/soapboxslide/tree/main/soapboxslide) directory of the repository.
+You can also design your own slide in a TOML file with the same structure, and load it with `Slide.from_file("my_slide.toml")`.
 
 The `slide()` function is fully vectorized: one may also provide an array of points to calculate many altitudes efficiently.
 (This is useful for plotting.)
@@ -98,7 +105,7 @@ from soapboxslide import Slide
 jax.config.update("jax_enable_x64", True)
 
 # Define the slide and its gradient
-slide = Slide.from_file("boxcar_blitz.toml")
+slide = Slide.from_name("boxcar_blitz")
 alt_grad = jax.jit(jax.vmap(jax.grad(
     lambda pos: slide(pos, npw=jnp)[2]
 )))
@@ -147,7 +154,7 @@ import matplotlib.pyplot as plt
 from soapboxslide import Slide
 
 # Prepare plot with slide surface
-slide = Slide.from_file("boxcar_blitz.toml")
+slide = Slide.from_name("boxcar_blitz")
 fig, ax = plt.subplots(figsize=(8, 7))
 slide.plot(fig, ax)
 
@@ -205,4 +212,4 @@ Some guidelines:
   instead of hard-coding the values, so that all simulations use the same limits.
 - When creating a `Trajectory` instance, you will get a `TypeError` or `ValueError` if some of the data do not meet basic expectations.
 
-The meaning of and requirements for all attributes are further elaborated in the docstrings in [`soapboxslide.py`](https://github.com/molmod/soapboxslide/blob/main/soapboxslide.py).
+The meaning of and requirements for all attributes are further elaborated in the docstrings in [`soapboxslide/__init__.py`](https://github.com/molmod/soapboxslide/blob/main/soapboxslide/__init__.py).

@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 # SPDX-FileCopyrightText: 2025 Toon Verstraelen <Toon.Verstraelen@UGent.be>
 # SPDX-License-Identifier: GPL-3.0-or-later
-"""Plot the two slides included in the repository."""
+"""Plot the two slides included in the soapboxslide package."""
 
 import matplotlib.pyplot as plt
 
@@ -10,11 +10,11 @@ from soapboxslide import Slide
 
 def main():
     fig, axs = plt.subplots(2, 1, figsize=(7, 12))
-    paths_toml = ["boxcar_blitz.toml", "brutal_bends.toml"]
-    for ax, path_toml in zip(axs, paths_toml, strict=True):
-        slide = Slide.from_file(path_toml)
+    names = ["boxcar_blitz", "brutal_bends"]
+    for ax, name in zip(axs, names, strict=True):
+        slide = Slide.from_name(name)
         slide.plot(fig, ax)
-        ax.set_title(path_toml)
+        ax.set_title(name)
     fig.savefig("slides.jpg")
 
 

@@ -2,7 +2,8 @@
 # SPDX-License-Identifier: GPL-3.0-or-later
 """Unit tests for Soap Box Slide."""
 
-from pathlib import Path
+import re
+from importlib.resources import as_file, files
 
 import attrs
 import numpy as np
@@ -12,23 +13,39 @@ from matplotlib.figure import Figure
 
 from soapboxslide import EndState, Slide, Trajectory
 
-ROOT = Path(__file__).parent
-SLIDE_FILES = ["boxcar_blitz.toml", "brutal_bends.toml"]
+SLIDE_NAMES = ["boxcar_blitz", "brutal_bends"]
 
 
 def test_readme_example():
     # The example in README.md. This guards against accidental changes to the surface.
     # Deliberate changes to the surface must update the README and this test together.
-    slide = Slide.from_file(ROOT / "boxcar_blitz.toml")
+    slide = Slide.from_name("boxcar_blitz")
     result = slide(np.array([5.0, 38.0]))
     np.testing.assert_allclose(result, [2.04001764, 0.20172108, 14.75990762], rtol=1e-7)
 
 
-@pytest.mark.parametrize("name", SLIDE_FILES)
+@pytest.mark.parametrize("name", SLIDE_NAMES)
+def test_from_name(name):
+    # A slide loaded by name must be identical to the same TOML file loaded with from_file.
+    slide_name = Slide.from_name(name)
+    with as_file(files("soapboxslide") / f"{name}.toml") as path_toml:
+        slide_file = Slide.from_file(path_toml)
+    for attr in attrs.fields(Slide):
+        assert np.array_equal(getattr(slide_name, attr.name), getattr(slide_file, attr.name))
+
+
+@pytest.mark.parametrize("name", ["boxcar_blitz.toml", "Boxcar_Blitz", "../pyproject", ""])
+def test_from_name_unknown(name):
+    # The error message lists exactly the included slides.
+    with pytest.raises(ValueError, match=re.escape(str(SLIDE_NAMES))):
+        Slide.from_name(name)
+
+
+@pytest.mark.parametrize("name", SLIDE_NAMES)
 @pytest.mark.filterwarnings("error")
 def test_far_from_track(name):
     # Far from all control points, the weights must not underflow to zero (0/0 = NaN).
-    slide = Slide.from_file(ROOT / name)
+    slide = Slide.from_name(name)
     result = slide(np.array([[200.0, -150.0], [-1e3, 1e3]]))
     assert all(np.isfinite(item).all() for item in result)
 
@@ -63,10 +80,10 @@ def npw_backend(request):
 NPW_POINTS = np.array([[5.0, 38.0], [12.1, 7.3], [10.7, 25.5], [30.0, 20.0], [-3.0, 44.0]])
 
 
-@pytest.mark.parametrize("name", SLIDE_FILES)
+@pytest.mark.parametrize("name", SLIDE_NAMES)
 def test_npw_values(name, npw_backend):
     npw, _, _ = npw_backend
-    slide = Slide.from_file(ROOT / name)
+    slide = Slide.from_name(name)
     expected = slide(NPW_POINTS)
     # Use a 3D input array to also test the vectorization over multiple axes.
     points = npw.array(NPW_POINTS.reshape(5, 1, 2))
@@ -76,10 +93,10 @@ def test_npw_values(name, npw_backend):
 
 
 @pytest.mark.parametrize("npw_backend", ["jax", "autograd"], indirect=True)
-@pytest.mark.parametrize("name", SLIDE_FILES)
+@pytest.mark.parametrize("name", SLIDE_NAMES)
 def test_npw_derivatives(name, npw_backend):
     npw, grad, hessian = npw_backend
-    slide = Slide.from_file(ROOT / name)
+    slide = Slide.from_name(name)
     alt_grad = grad(lambda point: slide(point, npw=npw)[2])
     alt_hess = hessian(lambda point: slide(point, npw=npw)[2])
     eps = 1e-5
@@ -97,9 +114,9 @@ def test_npw_derivatives(name, npw_backend):
         np.testing.assert_allclose(alt_hess(point), hess_fd, atol=1e-7, rtol=1e-7)
 
 
-@pytest.mark.parametrize("name", SLIDE_FILES)
+@pytest.mark.parametrize("name", SLIDE_NAMES)
 def test_controls_endpoints(name):
-    slide = Slide.from_file(ROOT / name)
+    slide = Slide.from_name(name)
     np.testing.assert_allclose(slide.controls[0], slide.waypoints[0])
     np.testing.assert_allclose(slide.controls[-1], slide.waypoints[-1])
 
@@ -118,10 +135,10 @@ def test_controls_straight_nonuniform():
     np.testing.assert_allclose(np.diff(us)[:-1], 2.0 / speeds)
 
 
-@pytest.mark.parametrize("name", SLIDE_FILES)
+@pytest.mark.parametrize("name", SLIDE_NAMES)
 @pytest.mark.filterwarnings("error")
 def test_plot(name, tmp_path):
-    slide = Slide.from_file(ROOT / name)
+    slide = Slide.from_name(name)
     # Use Figure instead of pyplot, so the Agg backend is used without global state.
     fig = Figure()
     ax = fig.add_subplot()
@@ -131,7 +148,7 @@ def test_plot(name, tmp_path):
 
 
 def test_plot_image_extent():
-    slide = Slide.from_file(ROOT / "boxcar_blitz.toml")
+    slide = Slide.from_name("boxcar_blitz")
     fig = Figure()
     ax = fig.add_subplot()
     spacing = 0.5

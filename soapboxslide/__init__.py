@@ -4,6 +4,7 @@
 
 import tomllib
 from enum import Enum
+from importlib.resources import files
 
 import attrs
 import matplotlib.colors as mcolors
@@ -211,6 +212,25 @@ class Slide:
         with open(path_toml, "rb") as fh:
             data = tomllib.load(fh)
         return cls(**data)
+
+    @classmethod
+    def from_name(cls, name: str):
+        """Load one of the slides included in the `soapboxslide` package.
+
+        Parameters
+        ----------
+        name
+            The name of the slide, `"boxcar_blitz"` or `"brutal_bends"`.
+            Everyone using the same version of `soapboxslide` gets the same slide.
+        """
+        paths = {
+            path.name.removesuffix(".toml"): path
+            for path in files(__name__).iterdir()
+            if path.name.endswith(".toml")
+        }
+        if name not in paths:
+            raise ValueError(f"Unknown slide {name!r}, expected one of {sorted(paths)}")
+        return cls(**tomllib.loads(paths[name].read_text(encoding="utf-8")))
 
     def __call__(self, points, *, npw=np):
         """Compute slide properties at the given (x, y) coordinates.
