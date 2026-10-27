@@ -1,3 +1,8 @@
+<!--
+SPDX-FileCopyrightText: 2025 Toon Verstraelen <Toon.Verstraelen@UGent.be>
+SPDX-License-Identifier: GPL-3.0-or-later
+-->
+
 # Changelog
 
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),

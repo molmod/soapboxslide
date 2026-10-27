@@ -1,5 +1,10 @@
+# SPDX-FileCopyrightText: 2025 Toon Verstraelen <Toon.Verstraelen@UGent.be>
+# SPDX-License-Identifier: GPL-3.0-or-later
 __pycache__
 dist
 *.egg-info
 build
 tmp
+uv.lock
+.pytest_cache
+.ruff_cache

@@ -1,3 +1,8 @@
+<!--
+SPDX-FileCopyrightText: 2025 Toon Verstraelen <Toon.Verstraelen@UGent.be>
+SPDX-License-Identifier: GPL-3.0-or-later
+-->
+
 # A Computational Soap Box Slide
 
 [![release](https://github.com/molmod/soapboxslide/actions/workflows/release.yaml/badge.svg)](https://github.com/molmod/soapboxslide/actions/workflows/release.yaml)
