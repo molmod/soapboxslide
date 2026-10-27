@@ -8,6 +8,19 @@ on:
       - main
     tags:
       - 'v*'
+    paths:
+      # Only run on main if relevant files have changed.
+      # Path filters are not evaluated for tag pushes, so releases always run.
+      - soapboxslide.py
+      - pyproject.toml
+      - LICENSE
+      - README.md
+      - CHANGELOG.md
+      - .github/scripts/extract-notes.sh
+      - .github/workflows/release.yaml
+
+# No permissions by default, each job requests only what it needs.
+permissions: {}
 
 env:
   # This is not critical
@@ -18,40 +31,51 @@ env:
 jobs:
   build:
     name: Build distribution
+    timeout-minutes: 2
     runs-on: ubuntu-latest
+    permissions:
+      actions: write
+      contents: read
 
     steps:
-    - uses: actions/checkout@v4
+    - uses: actions/checkout@v6
       with:
+        # Full history is needed by setuptools_scm to derive the version.
         fetch-depth: 0
+        persist-credentials: false
     - name: Set up Python
-      uses: actions/setup-python@v5
+      uses: actions/setup-python@v6
       with:
         python-version: '3.11'
-    - name: Install pypa/build
-      run: >-
-        python -m pip install build
+    - name: Set up uv
+      uses: astral-sh/setup-uv@v10.0.1
     - name: Build package
       run: >-
-        python -m build
+        uv build
     - name: Store the distribution packages
-      uses: actions/upload-artifact@v4
+      uses: actions/upload-artifact@v7
       with:
         name: python-package-distributions
         path: dist/
+        if-no-files-found: error
     - name: Run release notes script
+      env:
+        REPOSITORY: ${{ github.repository }}
+        REF: ${{ github.ref }}
       run: >-
         .github/scripts/extract-notes.sh
-        '${{ github.repository }}'
-        '${{ github.ref }}'
+        "${REPOSITORY}"
+        "${REF}"
     - name: Store the release notes
-      uses: actions/upload-artifact@v4
+      uses: actions/upload-artifact@v7
       with:
         name: release-notes
         path: notes.md
+        if-no-files-found: error
 
   publish-to-pypi:
     name: Publish Python distribution to PyPI
+    timeout-minutes: 2
     if: startsWith(github.ref, 'refs/tags/v')  # only publish to PyPI on tag pushes
     needs:
     - build
@@ -60,11 +84,12 @@ jobs:
       name: pypi
       url: https://pypi.org/p/${{ env.PYPI_NAME }}
     permissions:
+      actions: read
       id-token: write
 
     steps:
     - name: Download all the dists
-      uses: actions/download-artifact@v4
+      uses: actions/download-artifact@v8
       with:
         name: python-package-distributions
         path: dist/
@@ -75,26 +100,28 @@ jobs:
     name: >-
       Sign the Python distribution with Sigstore
       and upload them to GitHub Release
+    timeout-minutes: 2
     needs:
     - publish-to-pypi
     runs-on: ubuntu-latest
 
     permissions:
+      actions: read
       contents: write
       id-token: write
 
     steps:
     - name: Download all the dists
-      uses: actions/download-artifact@v4
+      uses: actions/download-artifact@v8
       with:
         name: python-package-distributions
         path: dist/
     - name: Download the release notes
-      uses: actions/download-artifact@v4
+      uses: actions/download-artifact@v8
       with:
         name: release-notes
     - name: Sign the dists with Sigstore
-      uses: sigstore/gh-action-sigstore-python@v3.0.0
+      uses: sigstore/gh-action-sigstore-python@v3.3.0
       with:
         inputs: >-
           ./dist/*.tar.gz
@@ -102,26 +129,31 @@ jobs:
     - name: Create GitHub Release
       env:
         GITHUB_TOKEN: ${{ github.token }}
+        REPOSITORY: ${{ github.repository }}
+        REF_NAME: ${{ github.ref_name }}
       run: >-
-        gh release create '${{ github.ref_name }}'
-        --repo '${{ github.repository }}'
-        --title '${{ env.TITLE }} ${{ github.ref_name }}'
+        gh release create "${REF_NAME}"
+        --repo "${REPOSITORY}"
+        --title "${TITLE} ${REF_NAME}"
         --notes-file notes.md
     - name: Upload artifact signatures to GitHub Release
       env:
         GITHUB_TOKEN: ${{ github.token }}
+        REPOSITORY: ${{ github.repository }}
+        REF_NAME: ${{ github.ref_name }}
       # Upload to GitHub Release using the `gh` CLI.
       # `dist/` contains the built packages, and the
       # sigstore-produced signatures and certificates.
       run: >-
         gh release upload
-        '${{ github.ref_name }}'
+        "${REF_NAME}"
         dist/**
-        --repo '${{ github.repository }}'
+        --repo "${REPOSITORY}"
 
   publish-to-testpypi:
     name: Publish Python distribution to TestPyPI
-    if: ${{ github.ref == 'refs/heads/main' &&  github.repository_owner == 'molmod'}}
+    timeout-minutes: 2
+    if: ${{ github.ref == 'refs/heads/main' && github.repository_owner == 'molmod' }}
     needs:
     - build
     runs-on: ubuntu-latest
@@ -131,11 +163,12 @@ jobs:
       url: https://test.pypi.org/p/${{ env.PYPI_NAME }}
 
     permissions:
+      actions: read
       id-token: write
 
     steps:
     - name: Download all the dists
-      uses: actions/download-artifact@v4
+      uses: actions/download-artifact@v8
       with:
         name: python-package-distributions
         path: dist/
