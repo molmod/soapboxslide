@@ -11,10 +11,15 @@ and this project adheres to [Effort-based Versioning](https://jacobtomlinson.dev
 
 ## [Unreleased]
 
-Improved graphics.
+Improved graphics and a corrected sampling of the slide track.
+The slide surfaces change slightly, so this release gets a meso version bump (1.1.0).
 
 ### Changed
 
+- Corrected the curvature estimate used to sample the slide track,
+  and the last control point now coincides with the finish.
+  This slightly changes the slide surfaces (up to ~0.7 m in altitude near the track),
+  so results from earlier versions are not exactly reproducible.
 - `Slide.get_hits` also accepts lists (or other array-like inputs) for `masses`, `points` and `stop`.
 - The constants `MAX_TIME` (60 s) and `FAR_MARGIN` (5 m) are exported and documented,
   so that all simulations use the same limits for `EndState.TIMEOUT` and `EndState.FAR`.

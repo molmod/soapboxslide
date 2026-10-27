@@ -181,12 +181,20 @@ class Slide:
             d1 = path_d1(u)[:2]
             d1_norm = np.linalg.norm(d1)
             d2 = path_d2(u)[:2]
-            c = d2 / d1_norm**2 + d1 * np.dot(d1, d2) / d1_norm**4
+            # Curvature vector: the part of d2 orthogonal to d1, divided by |d1|².
+            c = d2 / d1_norm**2 - d1 * np.dot(d1, d2) / d1_norm**4
             length = 0.5 / (0.25 + np.linalg.norm(c))
-            next_u = us[-1] + length / d1_norm
-            if next_u > steps[-1]:
+            next_u = u + length / d1_norm
+            if next_u >= steps[-1]:
                 break
             us.append(next_u)
+        # Let the track end exactly at the last waypoint.
+        # If the last sample is closer than half a step to the end,
+        # move it to the end instead of adding a nearly coincident control.
+        if len(us) > 1 and steps[-1] - u < 0.5 * (next_u - u):
+            us[-1] = float(steps[-1])
+        else:
+            us.append(float(steps[-1]))
 
         # Pre-compute properties along the sample points
         self.controls = path(us)

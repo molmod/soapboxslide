@@ -62,7 +62,7 @@ print(slide(np.array([5.0, 38.0])))
 This will show three results:
 
 ```text
-(array(2.05331579), array(0.20172586), array(14.75904983))
+(array(2.04001764), array(0.20172108), array(14.75990762))
 ```
 
 These three values have the following meaning (in meter):
@@ -108,9 +108,9 @@ print(alt_grad(pos))
 This will show three gradients, one for each row of `pos`:
 
 ```text
-[[ 0.21289734  0.10176584]
- [-1.85311237  1.84445056]
- [-2.16704263 -2.9280058 ]]
+[[ 0.21286679  0.10150386]
+ [-1.86091385  1.80566055]
+ [-2.18744618 -2.91699718]]
 ```
 
 In addition, a `Slide` instance has the following attributes:

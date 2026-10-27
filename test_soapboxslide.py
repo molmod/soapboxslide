@@ -7,6 +7,7 @@ from pathlib import Path
 import attrs
 import numpy as np
 import pytest
+import scipy as sp
 from matplotlib.figure import Figure
 
 from soapboxslide import EndState, Slide, Trajectory
@@ -20,7 +21,28 @@ def test_readme_example():
     # Deliberate changes to the surface must update the README and this test together.
     slide = Slide.from_file(ROOT / "boxcar_blitz.toml")
     result = slide(np.array([5.0, 38.0]))
-    np.testing.assert_allclose(result, [2.05331579, 0.20172586, 14.75904983], rtol=1e-7)
+    np.testing.assert_allclose(result, [2.04001764, 0.20172108, 14.75990762], rtol=1e-7)
+
+
+@pytest.mark.parametrize("name", SLIDE_FILES)
+def test_controls_endpoints(name):
+    slide = Slide.from_file(ROOT / name)
+    np.testing.assert_allclose(slide.controls[0], slide.waypoints[0])
+    np.testing.assert_allclose(slide.controls[-1], slide.waypoints[-1])
+
+
+def test_controls_straight_nonuniform():
+    # Unevenly spaced waypoints on a straight line: the spline speed varies,
+    # but the curvature is zero, so each step in the spline parameter u
+    # corresponds to a (first-order) length of 0.5 / 0.25 = 2 m.
+    waypoints = np.array([[x, 2.0, 0.0] for x in [0.0, 2.0, 5.0, 9.0, 14.0, 20.0]])
+    slide = Slide(width=20.0, height=4.0, target_radius=1.0, waypoints=waypoints)
+    np.testing.assert_allclose(slide.controls[:, 1], 2.0)
+    # Recover u at each control from the x coordinate.
+    path = sp.interpolate.CubicSpline(np.arange(len(waypoints)), waypoints[:, 0], bc_type="natural")
+    us = np.array([path.solve(x)[0] for x in slide.controls[:, 0]])
+    speeds = path.derivative()(us[:-2])
+    np.testing.assert_allclose(np.diff(us)[:-1], 2.0 / speeds)
 
 
 @pytest.mark.parametrize("name", SLIDE_FILES)
