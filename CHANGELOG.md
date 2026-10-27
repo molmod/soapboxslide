@@ -11,6 +11,10 @@ and this project adheres to [Effort-based Versioning](https://jacobtomlinson.dev
 
 ## [Unreleased]
 
+(no changees yet)
+
+## [1.1.0] - 2026-10-27
+
 Improved graphics and a corrected sampling of the slide track.
 The slide surfaces change slightly, so this release gets a meso version bump (1.1.0).
 
@@ -76,6 +80,7 @@ Small improvements.
 Initial release, just to get things started.
 
 [Unreleased]: https://github.com/molmod/soapboxslide
+[1.1.0]: https://github.com/molmod/soapboxslide/releases/tag/v1.1.0
 [1.0.2]: https://github.com/molmod/soapboxslide/releases/tag/v1.0.2
 [1.0.1]: https://github.com/molmod/soapboxslide/releases/tag/v1.0.1
 [1.0.0]: https://github.com/molmod/soapboxslide/releases/tag/v1.0.0
