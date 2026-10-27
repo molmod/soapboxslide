@@ -119,7 +119,7 @@ In addition, a `Slide` instance has the following attributes:
 - `target_radius`: a required proximity between a particle (or the center of mass of a system of particles) and a waypoint, to mark this waypoint as properly visited.
   The distance is only measured in the $xy$-plane.
 
-Note that the above surface plots show dashed circles centered on the waypoints, whose radius is the target radius.
+Note that the above surface plots show dotted circles centered on the waypoints, whose radius is the target radius.
 
 The `Slide` class also features two potentially useful methods:
 
@@ -167,8 +167,8 @@ traj = Trajectory(
     vel=...,         # NDArray[float], shape = (ntime, npoint, 3), (x, y and z coordinates)
     grad=...,        # NDArray[float], shape = (ntime, npoint, 2), (h_x and h_y derivatives)
     hess=...,        # NDArray[float], shape = (ntime, npoint, 3), (h_xx, h_xy and h_yy derivatives)
-    spring_idx=...,  # NDArray[int], shape = (nspring, 2), (each row is a pair of point indexes)
-    spring_par=...,  # NDArray[float], shape = (nspring, 3), (force constant, rest length, damping coeff)
+    spring_idx=...,  # Optional, NDArray[int], shape = (nspring, 2), (each row is a pair of point indexes)
+    spring_par=...,  # Optional, NDArray[float], shape = (nspring, 3), (force constant, rest length, damping coeff)
     end_state=...,   # One of the EndState members
     stop_time=...,   # Optional, time that last target was reached
     stop_pos=...,    # Optional, NDArray[float], shape = (npoint, 3), positions at stop time
@@ -180,7 +180,7 @@ traj.to_file("traj.npz")
 In this Python snippet, you need to replace all triple dots by arrays you defined or computed.
 Some guidelines:
 
-- If there are no springs yet, use arrays with zero rows for the spring definitions.
+- If there are no springs, you can omit `spring_idx` and `spring_par`.
 - If there is just one particle, several arrays will have a size 1 axis, i.e. `npoint=1`.
 - You can first store all fields in a dictionary, e.g. `data = {"time": ..., ...}` and optionally add the `stop_*` fields to the dictionary. The trajectory is then created with `Trajectory(**data)`.
 - The end state can be specified to indicate when the numerical integration has ended, using one of the `EndState` instances defined in the `soapboxslide` module:

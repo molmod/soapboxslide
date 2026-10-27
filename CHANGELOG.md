@@ -12,6 +12,7 @@ Improved graphics.
 
 - The plotting code has been tweaked to make the depth perception more intuitive.
 - Typos in docstrings, error messages and the README file.
+- Docstrings and README now match the code more closely.
 
 ## [1.0.2] - 2025-10-12
 

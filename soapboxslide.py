@@ -154,7 +154,7 @@ class Slide:
     """Overall height of the slide arena."""
 
     target_radius: float = attrs.field(converter=float, kw_only=True)
-    """Radius of sphere round a way point for start and stop regions."""
+    """Radius of the circle (in the xy plane) around each waypoint that must be visited."""
 
     waypoints: NDArray = attrs.field(
         converter=to_array(float),
@@ -242,8 +242,8 @@ class Slide:
 
         Notes
         -----
-        Vectorized NumPy operations make use of autograd's NumPy wrapper,
-        allowing for automatic differentiation of all results.
+        All array operations go through `npw`.
+        Passing `autograd.numpy` or `jax.numpy` makes all results differentiable.
         """
         out_shape = points.shape[:-1]
         points_2d = points.reshape((-1, 2))
@@ -299,17 +299,17 @@ class Slide:
         ax
             Matplotlib axes in which to draw.
         spacing
-            The spacing between grid points for the contour plot.
+            The spacing between grid points at which the surface is evaluated.
         alt_min
             The lowest altitude for the colorscale.
         alt_max
             The highest altitude for the colorscale.
         nlevel
-            The number of levels in the altitude color scale.
+            The number of altitude contour lines (only used with `add_altitude_lines`).
         cmap
             The colormap to use for the altitudes.
         add_altitude_fill
-            Plot the altitude with filled contours.
+            Plot the altitude as a color image.
         add_tracking
             Plot the tracking coordinates.
         add_hillshade
@@ -426,17 +426,17 @@ class Slide:
         stop: NDArray[float] | None = None,
         eps: float = 1e-6,
     ) -> tuple[NDArray[bool], NDArray[int]]:
-        """Return a boolean array with the targets that were hit.
+        """Determine which waypoints were visited by the center of mass.
 
         Parameters
         ----------
         masses
-            An array with point masses with shape `(npoint,)`
+            A NumPy array with point masses with shape `(npoint,)`.
         points
             An array with shape `(nstep, npoint, ncart)` with `ncart >= 2`.
-            The first index represents a point of the trajectory and the last index
-            corresponds to `x` and `y` coordinates, respectively.
-            Intermediate indexes are allowed.
+            The first index represents a time step of the trajectory,
+            the second index a point particle,
+            and the first two elements of the last index are the `x` and `y` coordinates.
         stop
             Optionally, the stopping point identified by SciPy's `solve_ivp`.
             This is used for (double)checking the last waypoint.
