@@ -58,12 +58,10 @@ You can load one of the slides included in the package by name
 and calculate slide properties at a given point, e.g. $x=5$ and $y=38$, as follows:
 
 ```python
-import numpy as np
-
 from soapboxslide import Slide
 
 slide = Slide.from_name("boxcar_blitz")
-print(slide(np.array([5.0, 38.0])))
+print(slide([5.0, 38.0]))
 ```
 
 This will show three results:

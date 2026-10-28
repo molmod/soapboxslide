@@ -30,6 +30,8 @@ which makes it easier to use with JAX and Autograd.
   they detect the array library of `points` and use it for all array operations.
   Automatic differentiation with JAX or Autograd (>=1.8.0) no longer needs extra arguments,
   e.g. `jax.grad(lambda pos: slide(pos)[2])`.
+- `Slide.__call__` also accepts lists and tuples, e.g. `slide([5.0, 38.0])`,
+  which are converted to NumPy arrays.
 - The `npw` keyword argument of `Slide.__call__` and `Slide.compute` has been removed.
 - New dependency: [`array-api-compat`](https://data-apis.org/array-api-compat/).
 - Unit tests also run with [`array-api-strict`](https://data-apis.org/array-api-strict/),

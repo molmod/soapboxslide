@@ -244,6 +244,7 @@ class Slide:
             Any array compatible with the
             [Python array API standard](https://data-apis.org/array-api/latest/) is supported,
             e.g. arrays from NumPy or JAX, or arrays traced by autograd.
+            Lists and tuples are converted to NumPy arrays.
 
         Returns
         -------
@@ -261,6 +262,9 @@ class Slide:
         All array operations use the array namespace of `points`,
         so results are differentiable when `points` is traced by JAX or autograd.
         """
+        # Lists and tuples have no array namespace.
+        if isinstance(points, list | tuple):
+            points = np.asarray(points, dtype=float)
         xp = array_namespace(points)
         out_shape = points.shape[:-1]
         points_2d = xp.reshape(points, (-1, 2))

@@ -21,7 +21,7 @@ def test_readme_example():
     # The example in README.md. This guards against accidental changes to the surface.
     # Deliberate changes to the surface must update the README and this test together.
     slide = Slide.from_name("boxcar_blitz")
-    result = slide(np.array([5.0, 38.0]))
+    result = slide([5.0, 38.0])
     np.testing.assert_allclose(result, [2.04001764, 0.20172108, 14.75990762], rtol=1e-7)
 
 
@@ -40,6 +40,18 @@ def test_from_name_unknown(name):
     # The error message lists exactly the included slides.
     with pytest.raises(ValueError, match=re.escape(str(SLIDE_NAMES))):
         Slide.from_name(name)
+
+
+@pytest.mark.parametrize(
+    "points", [[5.0, 38.0], (5.0, 38.0), [5, 38], [[5.0, 38.0], [12.1, 7.3]], [(5.0, 38.0)]]
+)
+def test_list_input(points):
+    # Lists and tuples (also of integers) give the same results as NumPy arrays of floats.
+    slide = Slide.from_name("boxcar_blitz")
+    expected = slide(np.array(points, dtype=float))
+    for item, item_expected in zip(slide(points), expected, strict=True):
+        assert isinstance(item, np.ndarray)
+        np.testing.assert_array_equal(item, item_expected)
 
 
 @pytest.mark.parametrize("name", SLIDE_NAMES)
