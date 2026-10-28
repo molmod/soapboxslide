@@ -41,7 +41,7 @@ jobs:
         os: [ubuntu-latest, macos-latest, windows-latest]
         platform:
           # Oldest supported Python with the oldest supported direct dependencies.
-          - python-version: '3.11'
+          - python-version: '3.12'
             resolution: lowest-direct
           # Newest supported Python with the newest dependencies.
           - python-version: '3.14'

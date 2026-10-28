@@ -34,6 +34,8 @@ which makes it easier to use with JAX and Autograd.
 - New dependency: [`array-api-compat`](https://data-apis.org/array-api-compat/).
 - Unit tests also run with [`array-api-strict`](https://data-apis.org/array-api-strict/),
   to guarantee that only functions from the array API standard are used.
+- The minimum supported Python version is now 3.12,
+  because `array-api-strict` only interoperates with NumPy on Python >= 3.12.
 
 ## [1.1.0] - 2026-10-27
 
