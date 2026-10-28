@@ -87,15 +87,16 @@ You can also design your own slide in a TOML file with the same structure, and l
 The `slide()` function is fully vectorized: one may also provide an array of points to calculate many altitudes efficiently.
 (This is useful for plotting.)
 
-The `slide()` function optionally supports alternative NumPy wrappers, such as those of [JAX](https://docs.jax.dev/) and its predecessor [Autograd](https://github.com/HIPS/autograd).
-This allows for an efficient evaluation of analytical partial derivatives of the altitude.
+The `slide()` function is written with the [Python array API standard](https://data-apis.org/array-api/latest/).
+It works with any compatible array type and always uses the array library of its argument.
+This includes arrays traced by [JAX](https://docs.jax.dev/) and its predecessor [Autograd](https://github.com/HIPS/autograd) (version 1.8.0 or newer),
+which allows for an efficient evaluation of analytical partial derivatives of the altitude.
 These libraries are not installed by default, but can be included with
 `pip install -U "soapboxslide[jax]"` or `pip install -U "soapboxslide[autograd]"`.
 For example, a vectorized calculation of many gradients is implemented as follows:
 
 ```python
 import jax
-import jax.numpy as jnp
 import numpy as np
 
 from soapboxslide import Slide
@@ -106,7 +107,7 @@ jax.config.update("jax_enable_x64", True)
 # Define the slide and its gradient
 slide = Slide.from_name("boxcar_blitz")
 alt_grad = jax.jit(jax.vmap(jax.grad(
-    lambda pos: slide(pos, npw=jnp)[2]
+    lambda pos: slide(pos)[2]
 )))
 
 # Compute the gradient at several points
@@ -166,6 +167,28 @@ fig.savefig("myplot.jpg")
 ```
 
 Consult the docstrings for more information on how to use the `get_hits` and `plot` methods.
+
+Most of the time spent in `Slide.plot` goes into evaluating the slide on a fine grid.
+This becomes several times faster with a JIT-compiled function from JAX,
+passed to `Slide.plot` with the `func` keyword argument:
+
+```python
+import jax
+import matplotlib.pyplot as plt
+
+from soapboxslide import Slide
+
+jax.config.update("jax_enable_x64", True)
+
+slide = Slide.from_name("boxcar_blitz")
+fig, ax = plt.subplots(figsize=(8, 7))
+# jax.jit cannot be applied to a Slide instance directly, hence the lambda.
+slide.plot(fig, ax, func=jax.jit(lambda points: slide(points)))
+fig.savefig("myplot.jpg")
+```
+
+The [`plot.py`](https://github.com/molmod/soapboxslide/blob/main/plot.py) script uses this approach,
+so you need to install JAX to run it, e.g. with `pip install -U "soapboxslide[jax]"`.
 
 ## Storing and Sharing Trajectory Data
 

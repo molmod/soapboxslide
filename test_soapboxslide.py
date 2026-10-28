@@ -9,6 +9,7 @@ import attrs
 import numpy as np
 import pytest
 import scipy as sp
+from array_api_compat import array_namespace
 from matplotlib.figure import Figure
 
 from soapboxslide import EndState, Slide, Trajectory
@@ -50,14 +51,18 @@ def test_far_from_track(name):
     assert all(np.isfinite(item).all() for item in result)
 
 
-@pytest.fixture(params=["numpy", "jax", "autograd"])
-def npw_backend(request):
-    """Return a NumPy wrapper and its grad and hessian transformations (None for NumPy).
+@pytest.fixture(params=["numpy", "array_api_strict", "jax", "autograd"])
+def backend(request):
+    """Return an array namespace and its grad and hessian transformations (None if unsupported).
 
-    JAX and autograd tests are skipped if these libraries are not installed.
+    The array_api_strict backend guards against the use of functions or array methods
+    that are not part of the array API standard.
+    Tests for optional backends are skipped if these libraries are not installed.
     """
     if request.param == "numpy":
         yield np, None, None
+    elif request.param == "array_api_strict":
+        yield pytest.importorskip("array_api_strict"), None, None
     elif request.param == "jax":
         jax = pytest.importorskip("jax")
         # Double precision is needed for a meaningful comparison.
@@ -77,30 +82,33 @@ def npw_backend(request):
 
 
 # Points near the start, near the track, between parts of the track and outside the arena.
-NPW_POINTS = np.array([[5.0, 38.0], [12.1, 7.3], [10.7, 25.5], [30.0, 20.0], [-3.0, 44.0]])
+BACKEND_POINTS = np.array([[5.0, 38.0], [12.1, 7.3], [10.7, 25.5], [30.0, 20.0], [-3.0, 44.0]])
 
 
 @pytest.mark.parametrize("name", SLIDE_NAMES)
-def test_npw_values(name, npw_backend):
-    npw, _, _ = npw_backend
+def test_backend_values(name, backend):
+    xp, _, _ = backend
     slide = Slide.from_name(name)
-    expected = slide(NPW_POINTS)
+    expected = slide(BACKEND_POINTS)
     # Use a 3D input array to also test the vectorization over multiple axes.
-    points = npw.array(NPW_POINTS.reshape(5, 1, 2))
-    for item, item_expected in zip(slide(points, npw=npw), expected, strict=True):
+    points = xp.asarray(BACKEND_POINTS.reshape(5, 1, 2))
+    for item, item_expected in zip(slide(points), expected, strict=True):
+        # The results must be arrays of the same library as the input.
+        assert array_namespace(item) is array_namespace(points)
         assert item.shape == (5, 1)
         np.testing.assert_allclose(np.asarray(item)[:, 0], item_expected, rtol=1e-12)
 
 
-@pytest.mark.parametrize("npw_backend", ["jax", "autograd"], indirect=True)
+@pytest.mark.parametrize("backend", ["jax", "autograd"], indirect=True)
 @pytest.mark.parametrize("name", SLIDE_NAMES)
-def test_npw_derivatives(name, npw_backend):
-    npw, grad, hessian = npw_backend
+def test_backend_derivatives(name, backend):
+    _, grad, hessian = backend
     slide = Slide.from_name(name)
-    alt_grad = grad(lambda point: slide(point, npw=npw)[2])
-    alt_hess = hessian(lambda point: slide(point, npw=npw)[2])
+    # No library-specific code is needed: slide uses the array namespace of the traced points.
+    alt_grad = grad(lambda point: slide(point)[2])
+    alt_hess = hessian(lambda point: slide(point)[2])
     eps = 1e-5
-    for point in NPW_POINTS:
+    for point in BACKEND_POINTS:
         # Compare to central finite differences of the altitude (computed with plain NumPy)
         # and of the gradient (computed with automatic differentiation).
         grad_fd = np.zeros(2)
@@ -145,6 +153,29 @@ def test_plot(name, tmp_path):
     # A coarse grid keeps the test fast. All optional layers are enabled to cover all branches.
     slide.plot(fig, ax, spacing=0.5, add_altitude_lines=True, add_spline=True)
     fig.savefig(tmp_path / "slide.png")
+
+
+@pytest.mark.parametrize("backend", ["numpy", "jax"], indirect=True)
+def test_plot_func(backend):
+    # A custom evaluation function, e.g. JIT-compiled with JAX, must give the same images.
+    xp, _, _ = backend
+    slide = Slide.from_name("boxcar_blitz")
+    calls = []
+
+    def func(points):
+        calls.append(points.shape)
+        return slide(xp.asarray(points))
+
+    images = []
+    for kwargs in {}, {"func": func}:
+        fig = Figure()
+        ax = fig.add_subplot()
+        slide.plot(fig, ax, spacing=0.5, **kwargs)
+        images.append([image.get_array() for image in ax.images])
+    assert len(calls) == 1
+    # The hillshade is a finite difference: rounding errors are only small in absolute terms.
+    for image0, image1 in zip(*images, strict=True):
+        np.testing.assert_allclose(image0, image1, rtol=1e-12, atol=1e-12)
 
 
 def test_plot_image_extent():

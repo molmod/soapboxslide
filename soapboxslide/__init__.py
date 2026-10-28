@@ -11,6 +11,7 @@ import matplotlib.colors as mcolors
 import matplotlib.pyplot as plt
 import numpy as np
 import scipy as sp
+from array_api_compat import array_namespace
 from numpy.typing import NDArray
 
 __all__ = ("FAR_MARGIN", "MAX_TIME", "STANDARD_GRAVITY", "EndState", "Slide", "Trajectory")
@@ -232,7 +233,7 @@ class Slide:
             raise ValueError(f"Unknown slide {name!r}, expected one of {sorted(paths)}")
         return cls(**tomllib.loads(paths[name].read_text(encoding="utf-8")))
 
-    def __call__(self, points, *, npw=np):
+    def __call__(self, points):
         """Compute slide properties at the given (x, y) coordinates.
 
         Parameters
@@ -240,11 +241,9 @@ class Slide:
         points
             An array of which the last index corresponds to the x and y coordinates (size 2).
             The evaluation is vectorized over all other indexes.
-        npw
-            A NumPy wrapper to use for array operations.
-            This can be plain `numpy` if the only goal is to evaluate the altitude.
-            Use `autograd.numpy` or `jax.numpy` when using automatic differentiation
-            or other features from the `autograd` or `jax` libraries, respectively.
+            Any array compatible with the
+            [Python array API standard](https://data-apis.org/array-api/latest/) is supported,
+            e.g. arrays from NumPy or JAX, or arrays traced by autograd.
 
         Returns
         -------
@@ -259,38 +258,50 @@ class Slide:
 
         Notes
         -----
-        All array operations go through `npw`.
-        Passing `autograd.numpy` or `jax.numpy` makes all results differentiable.
+        All array operations use the array namespace of `points`,
+        so results are differentiable when `points` is traced by JAX or autograd.
         """
+        xp = array_namespace(points)
         out_shape = points.shape[:-1]
-        points_2d = points.reshape((-1, 2))
-        track_x, track_y, altitude = self.compute(points_2d, npw=npw)
-        return (track_x.reshape(out_shape), track_y.reshape(out_shape), altitude.reshape(out_shape))
+        points_2d = xp.reshape(points, (-1, 2))
+        track_x, track_y, altitude = self.compute(points_2d)
+        return (
+            xp.reshape(track_x, out_shape),
+            xp.reshape(track_y, out_shape),
+            xp.reshape(altitude, out_shape),
+        )
 
-    def compute(self, points, *, npw=np):
+    def compute(self, points):
         """Low-level implementation of `__call__`.
 
         The difference with `__call__` is that `points` must be a 2D array,
         and the results are 1D arrays.
         """
+        xp = array_namespace(points)
+        # Arrays from other libraries cannot be mixed with NumPy arrays in the array API.
+        controls = xp.asarray(self.controls)
+        tangents = xp.asarray(self.tangents)
+        path_lengths = xp.asarray(self.path_lengths)
+
         # Compute sample weights
-        # - all squared distance between path points and points where functions must be computed.
-        deltas = self.controls[:, :2] - points.reshape(-1, 1, 2)
-        dists_sq = npw.einsum("pca,pca->pc", deltas, deltas)
+        # - x and y components of all relative vectors (rows: points, columns: controls).
+        dxs = controls[:, 0] - points[:, 0:1]
+        dys = controls[:, 1] - points[:, 1:2]
+        dists_sq = dxs**2 + dys**2
         # - Subtracting the smallest squared distance cancels out after normalization,
         #   but prevents all weights from underflowing to zero far away from the track.
-        dists_sq = dists_sq - dists_sq.min(axis=1).reshape(-1, 1)
+        dists_sq = dists_sq - xp.min(dists_sq, axis=1, keepdims=True)
         # - weights with shape (npoint, ncontrol), normalized each point over the controls.
-        weights = npw.exp(-0.3 * dists_sq)
-        weights /= weights.sum(axis=1).reshape(-1, 1)
+        weights = xp.exp(-0.3 * dists_sq)
+        weights = weights / xp.sum(weights, axis=1, keepdims=True)
 
         # Take weighted averages to construct slide track and altitude.
-        lxs = npw.einsum("ca,pca->pc", self.tangents, deltas)
-        deltas = deltas[:, :, ::-1]
-        lys = npw.einsum("ca,pca,a->pc", self.tangents, deltas, np.array([-1, 1]))
-        track_x = npw.einsum("pc,pc->p", lxs + self.path_lengths, weights)
-        track_y = npw.sqrt(npw.einsum("pc,pc->p", lys**2, weights))
-        altitude = npw.einsum("c,pc->p", self.controls[:, 2], weights) + 0.5 * track_y**2
+        # - Components of the relative vectors parallel and orthogonal to the tangents.
+        lxs = tangents[:, 0] * dxs + tangents[:, 1] * dys
+        lys = tangents[:, 1] * dxs - tangents[:, 0] * dys
+        track_x = xp.sum((lxs + path_lengths) * weights, axis=1)
+        track_y = xp.sqrt(xp.sum(lys**2 * weights, axis=1))
+        altitude = xp.sum(controls[:, 2] * weights, axis=1) + 0.5 * track_y**2
         return (track_x, track_y, altitude)
 
     def plot(
@@ -309,6 +320,7 @@ class Slide:
         add_altitude_lines: bool = False,
         add_spline: bool = False,
         add_targets: bool = True,
+        func=None,
     ):
         """Make a plot of the slide surface viewed from the sky.
 
@@ -340,6 +352,11 @@ class Slide:
             Plot the spline from which the slide geometry is derived.
         add_targets
             Include starting, intermediate and stopping regions.
+        func
+            The function used to evaluate the slide on the grid points.
+            It must behave like `__call__` and defaults to the slide itself.
+            For faster plotting, one may pass a JIT-compiled version,
+            e.g. `jax.jit(lambda points: slide(points))`.
         """
         # Rectangular grid for contour plotting
         nx = round(self.width / spacing)
@@ -352,8 +369,11 @@ class Slide:
         grid_points[:, :, 0] = xg
         grid_points[:, :, 1] = yg.reshape(-1, 1)
 
-        # Evaluate functions on grid points
-        track_x, track_y, altitude = self(grid_points)
+        # Evaluate functions on grid points.
+        # Results are converted to NumPy arrays, in case func returns arrays of another library.
+        if func is None:
+            func = self
+        track_x, track_y, altitude = (np.asarray(result) for result in func(grid_points))
 
         # Images exclude the padding and have their pixel centers on the grid points.
         # The half-pixel border is cropped by set_xlim and set_ylim below.

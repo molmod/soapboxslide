@@ -11,7 +11,29 @@ and this project adheres to [Effort-based Versioning](https://jacobtomlinson.dev
 
 ## [Unreleased]
 
-(no changees yet)
+(no changes yet)
+
+## [1.2.0] - 2026-10-28
+
+The slide is now implemented with the Python array API standard,
+which makes it easier to use with JAX and Autograd.
+
+### Added
+
+- `Slide.plot` has a new keyword argument `func` to evaluate the slide with a custom function,
+  e.g. JIT-compiled with JAX, which makes plotting several times faster.
+  The `plot.py` script uses this feature and therefore requires JAX.
+
+### Changed
+
+- `Slide.__call__` and `Slide.compute` follow the [Python array API standard](https://data-apis.org/array-api/latest/):
+  they detect the array library of `points` and use it for all array operations.
+  Automatic differentiation with JAX or Autograd (>=1.8.0) no longer needs extra arguments,
+  e.g. `jax.grad(lambda pos: slide(pos)[2])`.
+- The `npw` keyword argument of `Slide.__call__` and `Slide.compute` has been removed.
+- New dependency: [`array-api-compat`](https://data-apis.org/array-api-compat/).
+- Unit tests also run with [`array-api-strict`](https://data-apis.org/array-api-strict/),
+  to guarantee that only functions from the array API standard are used.
 
 ## [1.1.0] - 2026-10-27
 
@@ -80,6 +102,7 @@ Small improvements.
 Initial release, just to get things started.
 
 [Unreleased]: https://github.com/molmod/soapboxslide
+[1.2.0]: https://github.com/molmod/soapboxslide/releases/tag/v1.2.0
 [1.1.0]: https://github.com/molmod/soapboxslide/releases/tag/v1.1.0
 [1.0.2]: https://github.com/molmod/soapboxslide/releases/tag/v1.0.2
 [1.0.1]: https://github.com/molmod/soapboxslide/releases/tag/v1.0.1
